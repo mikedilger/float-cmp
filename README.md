@@ -1,4 +1,7 @@
 # float-cmp
+
+[![Build Status](https://travis-ci.org/mikedilger/float-cmp.svg?branch=master)](https://travis-ci.org/mikedilger/float-cmp)
+
 float-cmp defines traits for approximate floating point comparison, including
 ApproxEq, ApproxOrd, and Ulps, where the caller specifies the number of adjacent
 floating point representations (called `ulps`) that are allowed between two
