@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `float-cmp` crate.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, float-cmp">
+
+    <title>float-cmp - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../main.css">
+
+    
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <section class="sidebar">
+        
+        <p class='location'></p>
+    </section>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press 'S' to search, '?' for more options..."
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content mod">
+<h1 class='fqn'><span class='in-band'>Crate <a class='mod' href=''>float-cmp</a><wbr></span><span class='out-of-band'><a href='stability.html'>[stability]</a> <span id='render-detail'>
+            <a id="collapse-all" href="#">[-]
+            </a>&nbsp;<a id="expand-all" href="#">[+]</a>
+        </span><a id='src-0' href='../src/float-cmp/lib.rs.html#4-408'>[src]</a></span></h1>
+<div class='docblock'><p>Defines traits <code>ApproxEq</code>, <code>ApproxOrd</code>, and <code>Ulps</code>, for approximate
+comparison of floating point types.  Defines implementations for <code>f32</code>
+and <code>f64</code></p>
+
+<p>Floating point operations must round answers to the nearest representable
+number.  Multiple operations, then, may result in an answer different than
+what you expect.  In the following example, the assert will fail, even
+though the printed output says &quot;0.45 == 0.45&quot;:</p>
+<pre id='rust-example-rendered' class='rust '>
+  <span class='kw'>let</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='number'>0.15_f32</span> <span class='op'>+</span> <span class='number'>0.15_f32</span> <span class='op'>+</span> <span class='number'>0.15_f32</span>;
+  <span class='kw'>let</span> <span class='ident'>b</span> <span class='op'>=</span> <span class='number'>0.1_f32</span> <span class='op'>+</span> <span class='number'>0.1_f32</span> <span class='op'>+</span> <span class='number'>0.25_f32</span>;
+  <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;{} == {}&quot;</span>, <span class='ident'>a</span>, <span class='ident'>b</span>);
+  <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>a</span><span class='op'>==</span><span class='ident'>b</span>)  <span class='comment'>// Fails, because they are not exactly equal</span>
+</pre>
+
+<p>With an approximate comparison, we could get the answer we intend:</p>
+<pre id='rust-example-rendered' class='rust '>
+  <span class='kw'>let</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='number'>0.15_f32</span> <span class='op'>+</span> <span class='number'>0.15_f32</span> <span class='op'>+</span> <span class='number'>0.15_f32</span>;
+  <span class='kw'>let</span> <span class='ident'>b</span> <span class='op'>=</span> <span class='number'>0.1_f32</span> <span class='op'>+</span> <span class='number'>0.1_f32</span> <span class='op'>+</span> <span class='number'>0.25_f32</span>;
+  <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;{} == {}&quot;</span>, <span class='ident'>a</span>, <span class='ident'>b</span>);
+  <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>a</span>.<span class='ident'>approx_eq</span>(<span class='kw-2'>&amp;</span><span class='ident'>b</span>,<span class='number'>2</span>)) <span class='comment'>// They are equal, within 2 ulps</span>
+</pre>
+
+<p>We use the term &quot;ulp&quot; (units in the last place, or units of least precision)
+to mean the unit of distance between two adjacent floating point
+representations (adjacent meaning that there is no floating point number
+between them).  The size of an ulp (measured as a float) varies depending
+on the exponents of the floating point numbers in question, but this is quite
+useful, for it is the non-variation of a fixed epsilon (e.g. 0.0000001) which
+causes epsilon-based comparisons to so often fail with more extreme floating
+point values.</p>
+
+<p>What we do is define approximate comparison by specifying the maximum number
+of ULPs that the comparands are allowed to differ by.</p>
+</div><h2 id='traits' class='section-header'><a href="#traits">Traits</a></h2>
+<table>
+                    <tr>
+                        <td><a class='stability Unmarked' title='No stability level'></a><a class='trait' href='trait.ApproxEq.html'
+                               title='float-cmp::ApproxEq'>ApproxEq</a></td>
+                        <td class='docblock short'><p>ApproxEq is a trait for approximate equality comparisons, and is defined only
+for floating point types.</p>
+</td>
+                    </tr>
+                
+                    <tr>
+                        <td><a class='stability Unmarked' title='No stability level'></a><a class='trait' href='trait.ApproxOrd.html'
+                               title='float-cmp::ApproxOrd'>ApproxOrd</a></td>
+                        <td class='docblock short'><p>ApproxOrd is for sorting floating point values where approximate equality
+is considered equal.</p>
+</td>
+                    </tr>
+                
+                    <tr>
+                        <td><a class='stability Unmarked' title='No stability level'></a><a class='trait' href='trait.Ulps.html'
+                               title='float-cmp::Ulps'>Ulps</a></td>
+                        <td class='docblock short'></td>
+                    </tr>
+                </table></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <div id="help" class="hidden">
+        <div class="shortcuts">
+            <h1>Keyboard shortcuts</h1>
+            <dl>
+                <dt>?</dt>
+                <dd>Show this help dialog</dd>
+                <dt>S</dt>
+                <dd>Focus the search field</dd>
+                <dt>&larrb;</dt>
+                <dd>Move up in search results</dd>
+                <dt>&rarrb;</dt>
+                <dd>Move down in search results</dd>
+                <dt>&#9166;</dt>
+                <dd>Go to active search result</dd>
+            </dl>
+        </div>
+        <div class="infos">
+            <h1>Search tricks</h1>
+            <p>
+                Prefix searches with a type followed by a colon (e.g.
+                <code>fn:</code>) to restrict the search to a given type.
+            </p>
+            <p>
+                Accepted types are: <code>fn</code>, <code>mod</code>,
+                <code>struct</code>, <code>enum</code>,
+                <code>trait</code>, <code>typedef</code> (or
+                <code>tdef</code>).
+            </p>
+        </div>
+    </div>
+
+    
+
+    <script>
+        window.rootPath = "../";
+        window.currentCrate = "float-cmp";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../jquery.js"></script>
+    <script src="../main.js"></script>
+    
+    <script async src="../search-index.js"></script>
+</body>
+</html>
