@@ -1,0 +1,5 @@
+[package]
+
+name = "float-cmp"
+version = "0.0.1"
+authors = ["Mike Dilger <mike@mikedilger.com>"]
