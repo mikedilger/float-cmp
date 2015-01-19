@@ -1,5 +1,16 @@
 [package]
-
 name = "float-cmp"
 version = "0.0.1"
 authors = ["Mike Dilger <mike@mikedilger.com>"]
+description = "Floating point approximate comparison traits"
+repository = "https://github.com/mikedilger/float-cmp"
+readme = "README.md"
+keywords = [ "float", "floating", "point", "comparison", "fuzzy", "approximate" ]
+license = "MIT"
+
+[lib]
+name = "float-cmp"
+path = "src/lib.rs"
+test = true
+doctest = true
+doc = true
