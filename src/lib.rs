@@ -206,6 +206,12 @@ fn f32_approx_eq_test2() {
     assert!(x.approx_eq(&y,2) == true);
     assert!(x.approx_eq(&y,1) == false);
 }
+#[test]
+fn f32_approx_eq_test_zeroes() {
+    let x: f32 = 0.0_f32;
+    let y: f32 = -0.0_f32;
+    assert!(x.approx_eq(&y,0) == true);
+}
 
 impl ApproxEq for f64 {
     fn approx_eq(&self, other: &f64, ulps: i64) -> bool {
@@ -243,6 +249,12 @@ fn f64_approx_eq_test2() {
     println!("Ulps Difference: {}",x.ulps(&y));
     assert!(x.approx_eq(&y,3) == true);
     assert!(x.approx_eq(&y,2) == false);
+}
+#[test]
+fn f64_approx_eq_test_zeroes() {
+    let x: f64 = 0.0_f64;
+    let y: f64 = -0.0_f64;
+    assert!(x.approx_eq(&y,0) == true);
 }
 
 /**
