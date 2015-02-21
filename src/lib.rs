@@ -190,7 +190,7 @@ impl ApproxEq for f32 {
 fn f32_approx_eq_test1() {
     let f: f32 = 0.1_f32;
     let mut sum: f32 = 0.0_f32;
-    for _ in (0_is..10_is) { sum += f; }
+    for _ in (0_isize..10_isize) { sum += f; }
     let product: f32 = f * 10.0_f32;
     assert!(sum != product); // Should not be directly equal:
     println!("Ulps Difference: {}",sum.ulps(&product));
@@ -234,7 +234,7 @@ impl ApproxEq for f64 {
 fn f64_approx_eq_test1() {
     let f: f64 = 0.1_f64;
     let mut sum: f64 = 0.0_f64;
-    for _ in (0_is..10_is) { sum += f; }
+    for _ in (0_isize..10_isize) { sum += f; }
     let product: f64 = f * 10.0_f64;
     assert!(sum != product); // Should not be directly equal:
     println!("Ulps Difference: {}",sum.ulps(&product));
@@ -341,7 +341,7 @@ impl ApproxOrd for f32 {
 fn f32_approx_cmp_test1() {
     let f: f32 = 0.1_f32;
     let mut sum: f32 = 0.0_f32;
-    for _ in (0_is..10_is) { sum += f; }
+    for _ in (0_isize..10_isize) { sum += f; }
     let product: f32 = f * 10.0_f32;
     assert!(sum != product); // Should not be directly equal:
     println!("Ulps Difference: {}",sum.ulps(&product));
@@ -388,7 +388,7 @@ impl ApproxOrd for f64 {
 fn f64_approx_cmp_test1() {
     let f: f64 = 0.000000001_f64;
     let mut sum: f64 = 0.0_f64;
-    for _ in (0_is..10_is) { sum += f; }
+    for _ in (0_isize..10_isize) { sum += f; }
     let product: f64 = f * 10.0_f64;
     assert!(sum != product); // Should not be directly equal:
     println!("Ulps Difference: {}",sum.ulps(&product));
