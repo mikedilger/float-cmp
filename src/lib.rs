@@ -80,6 +80,9 @@ fn f32_ulps_test1() {
     println!("DIST IS {}",x.ulps(&y));
     assert!(x.ulps(&y) == -2);
 }
+/* These tests wont work anymore due to arithmetic overflow,
+   and we prefer not to use Wrapping Ops in ulps() just for these tests
+   because normal usage of ulps should detect overflow.
 #[test]
 fn f32_ulps_test2() {
     let pzero: f32 = unsafe { mem::transmute(0x00000000_u32) };
@@ -94,6 +97,7 @@ fn f32_ulps_test3() {
     println!("DIST IS {}",pinf.ulps(&ninf));
     assert!(pinf.ulps(&ninf) == -2147483648);
 }
+*/
 #[test]
 fn f32_ulps_test4() {
     let x: f32 = unsafe { mem::transmute(0x63a7f026_u32) };
@@ -128,6 +132,9 @@ fn f64_ulps_test1() {
     println!("DIST IS {}",x.ulps(&y));
     assert!(x.ulps(&y) == -86);
 }
+/* These tests wont work anymore due to arithmetic overflow,
+   and we prefer not to use Wrapping Ops in ulps() just for these tests
+   because normal usage of ulps should detect overflow.
 #[test]
 fn f64_ulps_test2() {
     let pzero: f64 = unsafe { mem::transmute(0x0000000000000000_u64) };
@@ -142,6 +149,7 @@ fn f64_ulps_test3() {
     println!("DIST IS {}",pinf.ulps(&ninf));
     assert!(pinf.ulps(&ninf) == -9223372036854775808i64);
 }
+*/
 #[test]
 fn f64_ulps_test4() {
     let x: f64 = unsafe { mem::transmute(0xd017f6cc63a7f026_u64) };
