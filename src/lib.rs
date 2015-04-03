@@ -42,13 +42,14 @@
 //! What we do is define approximate comparison by specifying the maximum number
 //! of ULPs that the comparands are allowed to differ by.
 
+extern crate num;
+
 use std::mem;
-use std::num::Float;
-use std::num::Int;
+use num::traits::Float;
 use std::cmp::Ordering;
 
 pub trait Ulps<Rhs = Self> : Float {
-    type U: Int;
+    type U;
 
     /// How many ULPs apart the two floating point numbers are.
     fn ulps(&self, other: &Rhs) -> <Self as Ulps>::U;

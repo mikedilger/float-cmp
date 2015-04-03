@@ -14,3 +14,6 @@ path = "src/lib.rs"
 test = true
 doctest = true
 doc = true
+
+[dependencies]
+num = "*"
