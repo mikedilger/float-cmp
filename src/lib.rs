@@ -20,7 +20,7 @@
 //! With an approximate comparison, we could get the answer we intend:
 //!
 //! ```
-//!   # extern crate "float-cmp" as float_cmp;
+//!   # extern crate float_cmp;
 //!   # use float_cmp::ApproxEq;
 //!   # fn main() {
 //!   let a = 0.15_f32 + 0.15_f32 + 0.15_f32;
