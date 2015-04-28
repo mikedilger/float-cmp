@@ -42,13 +42,10 @@
 //! What we do is define approximate comparison by specifying the maximum number
 //! of ULPs that the comparands are allowed to differ by.
 
-extern crate num;
-
 use std::mem;
-use num::traits::Float;
 use std::cmp::Ordering;
 
-pub trait Ulps<Rhs = Self> : Float {
+pub trait Ulps<Rhs = Self> {
     type U;
 
     /// How many ULPs apart the two floating point numbers are.
@@ -163,7 +160,7 @@ fn f64_ulps_test4() {
  * ApproxEq is a trait for approximate equality comparisons, and is defined only
  * for floating point types.
  */
-pub trait ApproxEq<Rhs = Self> : Float + Ulps {
+pub trait ApproxEq<Rhs = Self> : Ulps {
     /// This method tests for `self` and `other` values to be approximately equal
     /// within `ulps` floating point representations.  See module documetation
     /// for an understanding of `ulps`.
@@ -270,7 +267,7 @@ fn f64_approx_eq_test_zeroes() {
  * ApproxOrd is for sorting floating point values where approximate equality
  * is considered equal.
  */
-pub trait ApproxOrd<Rhs = Self>: ApproxEq<Rhs> + Float + Ulps {
+pub trait ApproxOrd<Rhs = Self>: ApproxEq<Rhs> + Ulps {
     /// This method returns an ordering between `self` and `other` values
     /// if one exists, where Equal is returned if they are approximately
     /// equal within `ulps` floating point representations.  See module
