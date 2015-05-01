@@ -1,13 +1,17 @@
 // Copyright 2014 Optimal Computing (NZ) Ltd.
 // Licensed under the MIT license.  See LICENSE for details.
 
-//! Defines traits `ApproxEq`, `ApproxOrd`, and `Ulps`, for approximate
-//! comparison of floating point types.  Defines implementations for `f32`
-//! and `f64`
+//! Defines traits `ApproxEqUlps`, `ApproxOrdUlps`, and `Ulps`, for
+//! approximate comparison of floating point types which have fallen away
+//! from equality due to rounding and inaccuracies within the floating point
+//! system.  Defines implementations for `f32` and `f64`.
+//!
+//! Also defines `ApproxEqRatio` and `ApproxOrdRatio` to define a notion of
+//! "close enough" based on the ratio of the difference to the smaller.
 //!
 //! Floating point operations must round answers to the nearest representable
-//! number.  Multiple operations, then, may result in an answer different than
-//! what you expect.  In the following example, the assert will fail, even
+//! number.  Multiple operations may result in an answer different from
+//! what you expect.  In the following example the assert will fail, even
 //! though the printed output says "0.45 == 0.45":
 //!
 //! ```should_fail
@@ -17,38 +21,46 @@
 //!   assert!(a==b)  // Fails, because they are not exactly equal
 //! ```
 //!
-//! With an approximate comparison, we could get the answer we intend:
+//! This fails due to rounding and inaccuracies within the floating point
+//! system.  With `ApproxEqUlps`, we can get the answer we intend:
 //!
 //! ```
 //!   # extern crate float_cmp;
-//!   # use float_cmp::ApproxEq;
+//!   # use float_cmp::ApproxEqUlps;
 //!   # fn main() {
 //!   let a = 0.15_f32 + 0.15_f32 + 0.15_f32;
 //!   let b = 0.1_f32 + 0.1_f32 + 0.25_f32;
 //!   println!("{} == {}", a, b);
-//!   assert!(a.approx_eq(&b,2)) // They are equal, within 2 ulps
+//!   assert!(a.approx_eq_ulps(&b,2)) // They are equal, within 2 ulps
 //!   # }
 //! ```
 //!
-//! We use the term "ulp" (units in the last place, or units of least precision)
-//! to mean the unit of distance between two adjacent floating point
-//! representations (adjacent meaning that there is no floating point number
-//! between them).  The size of an ulp (measured as a float) varies depending
-//! on the exponents of the floating point numbers in question, but this is quite
-//! useful, for it is the non-variation of a fixed epsilon (e.g. 0.0000001) which
-//! causes epsilon-based comparisons to so often fail with more extreme floating
-//! point values.
+//! We use the term ULP (units of least precision, or units in the last place)
+//! to mean the difference between two adjacent floating point representations
+//! (adjacent meaning that there is no floating point number between them).
+//! The size of an ulp (measured as a float) varies depending on the exponents of
+//! the floating point numbers in question, but this is quite useful, for it is
+//! the non-variation of a fixed epsilon (e.g. 0.0000001) which causes epsilon-based
+//! comparisons to so often fail with more extreme floating point values.
 //!
 //! What we do is define approximate comparison by specifying the maximum number
 //! of ULPs that the comparands are allowed to differ by.
 
-use std::mem;
-use std::cmp::Ordering;
+#![feature(zero_one)]
 
+use std::mem;
+use std::cmp::{Ordering,PartialOrd};
+use std::ops::{Sub,Div};
+use std::num::Zero;
+
+/// A trait for floating point numbers which computes the number of representable
+/// values or ULPs (Units of Least Precision) that separate the two given values.
 pub trait Ulps {
     type U;
 
-    /// How many ULPs apart the two floating point numbers are.
+    /// The number of representable values or ULPs (Units of Least Precision) that
+    /// separate `self` and `other`.  The result `U` is an integral value, and will
+    /// be zero if `self` and `other` are exactly equal.
     fn ulps(&self, other: &Self) -> <Self as Ulps>::U;
 }
 
@@ -152,27 +164,24 @@ fn f64_ulps_test4() {
     assert!(x.ulps(&y) == 3);
 }
 
-/**
- * ApproxEq is a trait for approximate equality comparisons, and is defined only
- * for floating point types.
- */
-pub trait ApproxEq : Ulps {
+
+/// ApproxEqUlps is a trait for approximate equality comparisons, and is defined only
+/// for floating point types.
+pub trait ApproxEqUlps : Ulps {
     /// This method tests for `self` and `other` values to be approximately equal
-    /// within `ulps` floating point representations.  See module documetation
-    /// for an understanding of `ulps`.
-    fn approx_eq(&self, other: &Self, ulps: <Self as Ulps>::U) -> bool;
+    /// within ULPs (Units of Least Precision) floating point representations.
+    fn approx_eq_ulps(&self, other: &Self, ulps: <Self as Ulps>::U) -> bool;
 
     /// This method tests for `self` and `other` values to be not approximately
-    /// equal, not within `ulps` floating point representations.  See module
-    /// documetation for an understanding of `ulps`.
+    /// equal within ULPs (Units of Least Precision) floating point representations.
     #[inline]
-    fn approx_ne(&self, other: &Self, ulps: <Self as Ulps>::U) -> bool {
-        !self.approx_eq(other, ulps)
+    fn approx_ne_ulps(&self, other: &Self, ulps: <Self as Ulps>::U) -> bool {
+        !self.approx_eq_ulps(other, ulps)
     }
 }
 
-impl ApproxEq for f32 {
-    fn approx_eq(&self, other: &f32, ulps: i32) -> bool {
+impl ApproxEqUlps for f32 {
+    fn approx_eq_ulps(&self, other: &f32, ulps: i32) -> bool {
         // -0 and +0 are drastically far in ulps terms, so
         // we need a special case for that.
         if *self==*other { return true; }
@@ -196,8 +205,8 @@ fn f32_approx_eq_test1() {
     let product: f32 = f * 10.0_f32;
     assert!(sum != product); // Should not be directly equal:
     println!("Ulps Difference: {}",sum.ulps(&product));
-    assert!(sum.approx_eq(&product,1) == true); // But should be close
-    assert!(sum.approx_eq(&product,0) == false);
+    assert!(sum.approx_eq_ulps(&product,1) == true); // But should be close
+    assert!(sum.approx_eq_ulps(&product,0) == false);
 }
 #[test]
 fn f32_approx_eq_test2() {
@@ -205,18 +214,18 @@ fn f32_approx_eq_test2() {
     let y: f32 = 1000000.1_f32;
     assert!(x != y); // Should not be directly equal
     println!("Ulps Difference: {}",x.ulps(&y));
-    assert!(x.approx_eq(&y,2) == true);
-    assert!(x.approx_eq(&y,1) == false);
+    assert!(x.approx_eq_ulps(&y,2) == true);
+    assert!(x.approx_eq_ulps(&y,1) == false);
 }
 #[test]
 fn f32_approx_eq_test_zeroes() {
     let x: f32 = 0.0_f32;
     let y: f32 = -0.0_f32;
-    assert!(x.approx_eq(&y,0) == true);
+    assert!(x.approx_eq_ulps(&y,0) == true);
 }
 
-impl ApproxEq for f64 {
-    fn approx_eq(&self, other: &f64, ulps: i64) -> bool {
+impl ApproxEqUlps for f64 {
+    fn approx_eq_ulps(&self, other: &f64, ulps: i64) -> bool {
         // -0 and +0 are drastically far in ulps terms, so
         // we need a special case for that.
         if *self==*other { return true; }
@@ -240,8 +249,8 @@ fn f64_approx_eq_test1() {
     let product: f64 = f * 10.0_f64;
     assert!(sum != product); // Should not be directly equal:
     println!("Ulps Difference: {}",sum.ulps(&product));
-    assert!(sum.approx_eq(&product,1) == true); // But should be close
-    assert!(sum.approx_eq(&product,0) == false);
+    assert!(sum.approx_eq_ulps(&product,1) == true); // But should be close
+    assert!(sum.approx_eq_ulps(&product,0) == false);
 }
 #[test]
 fn f64_approx_eq_test2() {
@@ -249,21 +258,19 @@ fn f64_approx_eq_test2() {
     let y: f64 = 1000000.0000000003_f64;
     assert!(x != y); // Should not be directly equal
     println!("Ulps Difference: {}",x.ulps(&y));
-    assert!(x.approx_eq(&y,3) == true);
-    assert!(x.approx_eq(&y,2) == false);
+    assert!(x.approx_eq_ulps(&y,3) == true);
+    assert!(x.approx_eq_ulps(&y,2) == false);
 }
 #[test]
 fn f64_approx_eq_test_zeroes() {
     let x: f64 = 0.0_f64;
     let y: f64 = -0.0_f64;
-    assert!(x.approx_eq(&y,0) == true);
+    assert!(x.approx_eq_ulps(&y,0) == true);
 }
 
-/**
- * ApproxOrd is for sorting floating point values where approximate equality
- * is considered equal.
- */
-pub trait ApproxOrd: ApproxEq + Ulps {
+/// ApproxOrdUlps is for sorting floating point values where approximate equality
+/// is considered equal.
+pub trait ApproxOrdUlps: ApproxEqUlps {
     /// This method returns an ordering between `self` and `other` values
     /// if one exists, where Equal is returned if they are approximately
     /// equal within `ulps` floating point representations.  See module
@@ -315,7 +322,7 @@ pub trait ApproxOrd: ApproxEq + Ulps {
     }
 }
 
-impl ApproxOrd for f32 {
+impl ApproxOrdUlps for f32 {
     fn approx_cmp(&self, other: &f32, ulps: <Self as Ulps>::U) -> Ordering {
 
         // -0 and +0 are drastically far in ulps terms, so
@@ -362,7 +369,7 @@ fn f32_approx_cmp_test2() {
     assert!(y.approx_cmp(&x,1) == Ordering::Greater);
 }
 
-impl ApproxOrd for f64 {
+impl ApproxOrdUlps for f64 {
     fn approx_cmp(&self, other: &f64, ulps: <Self as Ulps>::U) -> Ordering {
 
         // -0 and +0 are drastically far in ulps terms, so
@@ -408,3 +415,74 @@ fn f64_approx_cmp_test2() {
     assert!(x.approx_cmp(&y,2) == Ordering::Less);
     assert!(y.approx_cmp(&x,2) == Ordering::Greater);
 }
+
+/// ApproxEqRatio is a trait for approximate equality comparisons bounding the ratio
+/// of the difference to the smaller.
+pub trait ApproxEqRatio : Div<Output = Self> + Sub<Output = Self> + PartialOrd + Zero
+    + Sized + Copy
+{
+    /// This method tests if `self` and `other` are nearly equal by bounding the
+    /// difference between them to some number much less than the smaller of the two.
+    /// This bound is set as the ratio of the difference to the smaller.
+    fn approx_eq_ratio(&self, other: &Self, ratio: Self) -> bool {
+        if *self < Self::zero() && *other > Self::zero() { return false; }
+        if *self > Self::zero() && *other < Self::zero() { return false; }
+        let (smaller,larger) = if *self < *other {
+            (self,other)
+        } else {
+            (other,self)
+        };
+        let difference: Self = larger.sub(*smaller);
+        let actual_ratio: Self = difference.div(*smaller);
+        actual_ratio < ratio
+    }
+
+    /// This method tests if `self` and `other` are not nearly equal by bounding the
+    /// difference between them to some number much less than the smaller of the two.
+    /// This bound is set as the ratio of the difference to the smaller.
+    #[inline]
+    fn approx_ne_ratio(&self, other: &Self, ratio: Self) -> bool {
+        !self.approx_eq_ratio(other, ratio)
+    }
+}
+
+impl ApproxEqRatio for f32 { }
+
+#[test]
+fn f32_approx_eq_ratio_test1() {
+    let x: f32 = 0.00004_f32;
+    let y: f32 = 0.00004001_f32;
+    assert!(x.approx_eq_ratio(&y, 0.00026));
+    assert!(y.approx_eq_ratio(&x, 0.00026));
+    assert!(x.approx_ne_ratio(&y, 0.00024));
+    assert!(y.approx_ne_ratio(&x, 0.00024));
+}
+
+#[test]
+fn f32_approx_eq_ratio_test2() {
+    let x: f32 = 0.00000000001_f32;
+    let y: f32 = 0.00000000005_f32;
+    assert!(x.approx_ne_ratio(&y, 2.));
+    assert!(y.approx_ne_ratio(&x, 2.));
+}
+
+impl ApproxEqRatio for f64 { }
+
+#[test]
+fn f64_approx_eq_ratio_test1() {
+    let x: f64 = 0.000000004_f64;
+    let y: f64 = 0.000000004001_f64;
+    assert!(x.approx_eq_ratio(&y, 0.00026));
+    assert!(y.approx_eq_ratio(&x, 0.00026));
+    assert!(x.approx_ne_ratio(&y, 0.00024));
+    assert!(y.approx_ne_ratio(&x, 0.00024));
+}
+
+#[test]
+fn f64_approx_eq_ratio_test2() {
+    let x: f64 = 0.0000000000000001_f64;
+    let y: f64 = 0.0000000000000005_f64;
+    assert!(x.approx_ne_ratio(&y, 2.));
+    assert!(y.approx_ne_ratio(&x, 2.));
+}
+
