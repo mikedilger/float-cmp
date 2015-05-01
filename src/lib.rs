@@ -45,11 +45,11 @@
 use std::mem;
 use std::cmp::Ordering;
 
-pub trait Ulps<Rhs = Self> {
+pub trait Ulps {
     type U;
 
     /// How many ULPs apart the two floating point numbers are.
-    fn ulps(&self, other: &Rhs) -> <Self as Ulps>::U;
+    fn ulps(&self, other: &Self) -> <Self as Ulps>::U;
 }
 
 impl Ulps for f32 {
@@ -156,17 +156,17 @@ fn f64_ulps_test4() {
  * ApproxEq is a trait for approximate equality comparisons, and is defined only
  * for floating point types.
  */
-pub trait ApproxEq<Rhs = Self> : Ulps {
+pub trait ApproxEq : Ulps {
     /// This method tests for `self` and `other` values to be approximately equal
     /// within `ulps` floating point representations.  See module documetation
     /// for an understanding of `ulps`.
-    fn approx_eq(&self, other: &Rhs, ulps: <Self as Ulps>::U) -> bool;
+    fn approx_eq(&self, other: &Self, ulps: <Self as Ulps>::U) -> bool;
 
     /// This method tests for `self` and `other` values to be not approximately
     /// equal, not within `ulps` floating point representations.  See module
     /// documetation for an understanding of `ulps`.
     #[inline]
-    fn approx_ne(&self, other: &Rhs, ulps: <Self as Ulps>::U) -> bool {
+    fn approx_ne(&self, other: &Self, ulps: <Self as Ulps>::U) -> bool {
         !self.approx_eq(other, ulps)
     }
 }
@@ -263,18 +263,18 @@ fn f64_approx_eq_test_zeroes() {
  * ApproxOrd is for sorting floating point values where approximate equality
  * is considered equal.
  */
-pub trait ApproxOrd<Rhs = Self>: ApproxEq<Rhs> + Ulps {
+pub trait ApproxOrd: ApproxEq + Ulps {
     /// This method returns an ordering between `self` and `other` values
     /// if one exists, where Equal is returned if they are approximately
     /// equal within `ulps` floating point representations.  See module
     /// documentation for an understanding of `ulps`
-    fn approx_cmp(&self, other: &Rhs, ulps: <Self as Ulps>::U) -> Ordering;
+    fn approx_cmp(&self, other: &Self, ulps: <Self as Ulps>::U) -> Ordering;
 
     /// This method tests less than (for `self` < `other`), where values
     /// within `ulps` of each other are not less than.  See module
     /// documentation for an understanding of `ulps`.
     #[inline]
-    fn approx_lt(&self, other: &Rhs, ulps: <Self as Ulps>::U) -> bool {
+    fn approx_lt(&self, other: &Self, ulps: <Self as Ulps>::U) -> bool {
         match self.approx_cmp(other, ulps) {
             Ordering::Less => true,
             _ => false,
@@ -285,7 +285,7 @@ pub trait ApproxOrd<Rhs = Self>: ApproxEq<Rhs> + Ulps {
     /// where values within `ulps` are equal.  See module documentation
     /// for an understanding of `ulps`.
     #[inline]
-    fn approx_le(&self, other: &Rhs, ulps: <Self as Ulps>::U) -> bool {
+    fn approx_le(&self, other: &Self, ulps: <Self as Ulps>::U) -> bool {
         match self.approx_cmp(other, ulps) {
             Ordering::Less | Ordering::Equal => true,
             _ => false,
@@ -296,7 +296,7 @@ pub trait ApproxOrd<Rhs = Self>: ApproxEq<Rhs> + Ulps {
     /// where values within `ulps` are not greater than.  See module
     /// documentation for an understanding of `ulps`
     #[inline]
-    fn approx_gt(&self, other: &Rhs, ulps: <Self as Ulps>::U) -> bool {
+    fn approx_gt(&self, other: &Self, ulps: <Self as Ulps>::U) -> bool {
         match self.approx_cmp(other, ulps) {
             Ordering::Greater => true,
             _ => false,
@@ -307,7 +307,7 @@ pub trait ApproxOrd<Rhs = Self>: ApproxEq<Rhs> + Ulps {
     /// where values within `ulps` are equal.  See module documentation
     /// for an understanding of `ulps`.
     #[inline]
-    fn approx_ge(&self, other: &Rhs, ulps: <Self as Ulps>::U) -> bool {
+    fn approx_ge(&self, other: &Self, ulps: <Self as Ulps>::U) -> bool {
         match self.approx_cmp(other, ulps) {
             Ordering::Greater | Ordering::Equal => true,
             _ => false,
