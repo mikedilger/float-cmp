@@ -67,7 +67,7 @@ impl Ulps for f32 {
         let ai32: i32 = unsafe { mem::transmute(*self) };
         let bi32: i32 = unsafe { mem::transmute(*other) };
 
-        ai32 - bi32
+        ai32.wrapping_sub(bi32)
     }
 }
 
@@ -119,7 +119,7 @@ impl Ulps for f64 {
         let ai64: i64 = unsafe { mem::transmute(*self) };
         let bi64: i64 = unsafe { mem::transmute(*other) };
 
-        ai64 - bi64
+        ai64.wrapping_sub(bi64)
     }
 }
 
