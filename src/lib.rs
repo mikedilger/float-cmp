@@ -7,7 +7,7 @@
 //! system.  Defines implementations for `f32` and `f64`.
 //!
 //! Also defines `ApproxEqRatio` and `ApproxOrdRatio` to define a notion of
-//! "close enough" based on the ratio of the difference to the smaller.
+//! "close enough" based on the ratio of the difference to the larger.
 //!
 //! Floating point operations must round answers to the nearest representable
 //! number.  Multiple operations may result in an answer different from
@@ -417,13 +417,13 @@ fn f64_approx_cmp_test2() {
 }
 
 /// ApproxEqRatio is a trait for approximate equality comparisons bounding the ratio
-/// of the difference to the smaller.
+/// of the difference to the larger.
 pub trait ApproxEqRatio : Div<Output = Self> + Sub<Output = Self> + PartialOrd + Zero
     + Sized + Copy
 {
     /// This method tests if `self` and `other` are nearly equal by bounding the
-    /// difference between them to some number much less than the smaller of the two.
-    /// This bound is set as the ratio of the difference to the smaller.
+    /// difference between them to some number much less than the larger of the two.
+    /// This bound is set as the ratio of the difference to the larger.
     fn approx_eq_ratio(&self, other: &Self, ratio: Self) -> bool {
         if *self < Self::zero() && *other > Self::zero() { return false; }
         if *self > Self::zero() && *other < Self::zero() { return false; }
@@ -433,13 +433,13 @@ pub trait ApproxEqRatio : Div<Output = Self> + Sub<Output = Self> + PartialOrd +
             (other,self)
         };
         let difference: Self = larger.sub(*smaller);
-        let actual_ratio: Self = difference.div(*smaller);
+        let actual_ratio: Self = difference.div(*larger);
         actual_ratio < ratio
     }
 
     /// This method tests if `self` and `other` are not nearly equal by bounding the
-    /// difference between them to some number much less than the smaller of the two.
-    /// This bound is set as the ratio of the difference to the smaller.
+    /// difference between them to some number much less than the larger of the two.
+    /// This bound is set as the ratio of the difference to the larger.
     #[inline]
     fn approx_ne_ratio(&self, other: &Self, ratio: Self) -> bool {
         !self.approx_eq_ratio(other, ratio)
@@ -452,8 +452,8 @@ impl ApproxEqRatio for f32 { }
 fn f32_approx_eq_ratio_test1() {
     let x: f32 = 0.00004_f32;
     let y: f32 = 0.00004001_f32;
-    assert!(x.approx_eq_ratio(&y, 0.00026));
-    assert!(y.approx_eq_ratio(&x, 0.00026));
+    assert!(x.approx_eq_ratio(&y, 0.00025));
+    assert!(y.approx_eq_ratio(&x, 0.00025));
     assert!(x.approx_ne_ratio(&y, 0.00024));
     assert!(y.approx_ne_ratio(&x, 0.00024));
 }
@@ -462,8 +462,8 @@ fn f32_approx_eq_ratio_test1() {
 fn f32_approx_eq_ratio_test2() {
     let x: f32 = 0.00000000001_f32;
     let y: f32 = 0.00000000005_f32;
-    assert!(x.approx_ne_ratio(&y, 2.));
-    assert!(y.approx_ne_ratio(&x, 2.));
+    assert!(x.approx_eq_ratio(&y, 0.81));
+    assert!(y.approx_ne_ratio(&x, 0.79));
 }
 
 impl ApproxEqRatio for f64 { }
@@ -472,8 +472,8 @@ impl ApproxEqRatio for f64 { }
 fn f64_approx_eq_ratio_test1() {
     let x: f64 = 0.000000004_f64;
     let y: f64 = 0.000000004001_f64;
-    assert!(x.approx_eq_ratio(&y, 0.00026));
-    assert!(y.approx_eq_ratio(&x, 0.00026));
+    assert!(x.approx_eq_ratio(&y, 0.00025));
+    assert!(y.approx_eq_ratio(&x, 0.00025));
     assert!(x.approx_ne_ratio(&y, 0.00024));
     assert!(y.approx_ne_ratio(&x, 0.00024));
 }
@@ -482,7 +482,7 @@ fn f64_approx_eq_ratio_test1() {
 fn f64_approx_eq_ratio_test2() {
     let x: f64 = 0.0000000000000001_f64;
     let y: f64 = 0.0000000000000005_f64;
-    assert!(x.approx_ne_ratio(&y, 2.));
-    assert!(y.approx_ne_ratio(&x, 2.));
+    assert!(x.approx_eq_ratio(&y, 0.81));
+    assert!(y.approx_ne_ratio(&x, 0.79));
 }
 
