@@ -4,6 +4,7 @@ version = "0.2.1"
 authors = ["Mike Dilger <mike@mikedilger.com>"]
 description = "Floating point approximate comparison traits"
 repository = "https://github.com/mikedilger/float-cmp"
+documentation = "https://mikedilger.github.io/float-cmp"
 readme = "README.md"
 keywords = [ "float", "comparison", "fuzzy", "approximate" ]
 license = "MIT"
