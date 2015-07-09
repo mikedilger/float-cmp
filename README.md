@@ -1,6 +1,7 @@
 # float-cmp
 
 [![Build Status](https://travis-ci.org/mikedilger/float-cmp.svg?branch=master)](https://travis-ci.org/mikedilger/float-cmp)
+[![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
 Documentation is available at https://mikedilger.github.io/float-cmp
 
