@@ -1,18 +1,27 @@
 // Copyright 2014 Optimal Computing (NZ) Ltd.
 // Licensed under the MIT license.  See LICENSE for details.
 
-//! Defines traits `ApproxEqUlps`, `ApproxOrdUlps`, and `Ulps`, for
-//! approximate comparison of floating point types which have fallen away
-//! from equality due to rounding and inaccuracies within the floating point
-//! system.  Defines implementations for `f32` and `f64`.
+//! float-cmp defines traits for approximate comparison of floating point types which have fallen
+//! away from exact equality due to rounding and inaccuracies within the floating point unit of your
+//! computer's processor. Implementations of these traits are provided for `f32` and `f64` types.
 //!
-//! Also defines `ApproxEqRatio` and `ApproxOrdRatio` to define a notion of
-//! "close enough" based on the ratio of the difference to the larger.
+//! Two methods of comparison are provided. The first, `ApproxEqUlps` and `ApproxOrdUlps`, consider
+//! two comparands equal if the number of representable floating point numbers between them is
+//! below a specified bound. This works well in most cases.
 //!
-//! Floating point operations must round answers to the nearest representable
-//! number.  Multiple operations may result in an answer different from
-//! what you expect.  In the following example the assert will fail, even
-//! though the printed output says "0.45 == 0.45":
+//! The second method of comparison, `ApproxEqRatio`, considers two comparands equal if the ratio of
+//! the difference between them to the larger is below some specified bound.  This handles many of
+//! the cases that the former type of comparison doesn't handle well.
+//!
+//! To help choose which comparison method to use, and to learn many suprising facts and oddities
+//! about floating point numbers, please refer to the following excellent website:
+//! https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/
+//!
+//! The trait `Ulps` is also defined as a prerequisite for `ApproxEqUlps` and `ApproxOrdUlps`.
+//!
+//! Floating point operations must round answers to the nearest representable number.  Multiple
+//! operations may result in an answer different from what you expect.  In the following example,
+//! the assert will fail, even though the printed output says "0.45 == 0.45":
 //!
 //! ```should_fail
 //!   let a = 0.15_f32 + 0.15_f32 + 0.15_f32;
@@ -21,8 +30,8 @@
 //!   assert!(a==b)  // Fails, because they are not exactly equal
 //! ```
 //!
-//! This fails due to rounding and inaccuracies within the floating point
-//! system.  With `ApproxEqUlps`, we can get the answer we intend:
+//! This fails due to rounding and inaccuracies within the floating point unit of your processor.
+//! With `ApproxEqUlps`, we can get the answer we intend:
 //!
 //! ```
 //!   # extern crate float_cmp;
@@ -35,16 +44,16 @@
 //!   # }
 //! ```
 //!
-//! We use the term ULP (units of least precision, or units in the last place)
-//! to mean the difference between two adjacent floating point representations
-//! (adjacent meaning that there is no floating point number between them).
-//! The size of an ulp (measured as a float) varies depending on the exponents of
-//! the floating point numbers in question, but this is quite useful, for it is
-//! the non-variation of a fixed epsilon (e.g. 0.0000001) which causes epsilon-based
+//! We use the term ULP (units of least precision, or units in the last place) to mean the
+//! difference between two adjacent floating point representations (adjacent meaning that there is
+//! no floating point number between them).  The size of an ULP (measured as a float) varies
+//! depending on the exponents of the floating point numbers in question, but this is quite useful,
+//! for it is the non-variation of a fixed epsilon (e.g. 0.0000001) which causes epsilon-based
 //! comparisons to so often fail with more extreme floating point values.
 //!
-//! What we do is define approximate comparison by specifying the maximum number
-//! of ULPs that the comparands are allowed to differ by.
+//! Fixed epsilon systems of comparison tend to work well only on numbers within certain ranges.
+//! It may seem reasonable to expect numbers that differ by less than 0.000001 to be equal, but
+//! this does not always work well (consider comparing -0.0000000028 to +0.00000097).
 
 #![feature(zero_one)]
 
@@ -485,4 +494,3 @@ fn f64_approx_eq_ratio_test2() {
     assert!(x.approx_eq_ratio(&y, 0.81));
     assert!(y.approx_ne_ratio(&x, 0.79));
 }
-
