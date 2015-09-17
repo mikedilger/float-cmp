@@ -55,12 +55,12 @@
 //! It may seem reasonable to expect numbers that differ by less than 0.000001 to be equal, but
 //! this does not always work well (consider comparing -0.0000000028 to +0.00000097).
 
-#![feature(zero_one)]
+extern crate num;
+use num::Zero;
 
 use std::mem;
 use std::cmp::{Ordering,PartialOrd};
 use std::ops::{Sub,Div};
-use std::num::Zero;
 
 /// A trait for floating point numbers which computes the number of representable
 /// values or ULPs (Units of Least Precision) that separate the two given values.
