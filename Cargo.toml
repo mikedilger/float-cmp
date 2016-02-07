@@ -17,4 +17,4 @@ doctest = true
 doc = true
 
 [dependencies]
-num = "0.1"
+num = { version = "0.1", default-features = false }
