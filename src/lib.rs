@@ -55,7 +55,7 @@
 //! It may seem reasonable to expect numbers that differ by less than 0.000001 to be equal, but
 //! this does not always work well (consider comparing -0.0000000028 to +0.00000097).
 
-extern crate num;
+extern crate num_traits as num;
 use num::Zero;
 
 use std::mem;
