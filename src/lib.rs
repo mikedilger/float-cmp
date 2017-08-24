@@ -475,6 +475,26 @@ fn f32_approx_eq_ratio_test2() {
     assert!(y.approx_ne_ratio(&x, 0.79));
 }
 
+#[test]
+fn f32_approx_eq_ratio_test_zero_eq_zero_returns_true() {
+    let x: f32 = 0.0_f32;
+    assert!(x.approx_eq_ratio(&x,0.1) == true);
+}
+
+#[test]
+fn f32_approx_eq_ratio_test_zero_ne_zero_returns_false() {
+    let x: f32 = 0.0_f32;
+    assert!(x.approx_ne_ratio(&x,0.1) == false);
+}
+
+#[test]
+fn f32_approx_eq_ratio_test_negative_numbers() {
+    let x: f32 = -3.0_f32;
+    let y: f32 = -4.0_f32;
+    // -3 and -4 should not be equal at a ratio of 0.1
+    assert!(x.approx_eq_ratio(&y,0.1) == false);
+}
+
 impl ApproxEqRatio for f64 { }
 
 #[test]
@@ -494,3 +514,24 @@ fn f64_approx_eq_ratio_test2() {
     assert!(x.approx_eq_ratio(&y, 0.81));
     assert!(y.approx_ne_ratio(&x, 0.79));
 }
+
+#[test]
+fn f64_approx_eq_ratio_test_zero_eq_zero_returns_true() {
+    let x: f64 = 0.0_f64;
+    assert!(x.approx_eq_ratio(&x,0.1) == true);
+}
+
+#[test]
+fn f64_approx_eq_ratio_test_zero_ne_zero_returns_false() {
+    let x: f64 = 0.0_f64;
+    assert!(x.approx_ne_ratio(&x,0.1) == false);
+}
+
+#[test]
+fn f64_approx_eq_ratio_test_negative_numbers() {
+    let x: f64 = -3.0_f64;
+    let y: f64 = -4.0_f64;
+    // -3 and -4 should not be equal at a ratio of 0.1
+    assert!(x.approx_eq_ratio(&y,0.1) == false);
+}
+
