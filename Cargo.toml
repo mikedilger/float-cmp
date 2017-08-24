@@ -17,4 +17,4 @@ doctest = true
 doc = true
 
 [dependencies]
-num-traits = { version = "0.1", default-features = false }
+num = { version = "0.1", default-features = false }
