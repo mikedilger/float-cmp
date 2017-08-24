@@ -60,7 +60,7 @@ use num::Zero;
 
 use std::mem;
 use std::cmp::{Ordering,PartialOrd};
-use std::ops::{Sub,Div};
+use std::ops::{Sub,Div,Neg};
 
 /// A trait for floating point numbers which computes the number of representable
 /// values or ULPs (Units of Least Precision) that separate the two given values.
@@ -427,32 +427,40 @@ fn f64_approx_cmp_test2() {
 
 /// ApproxEqRatio is a trait for approximate equality comparisons bounding the ratio
 /// of the difference to the larger.
-pub trait ApproxEqRatio : Div<Output = Self> + Sub<Output = Self> + PartialOrd + Zero
-    + Sized + Copy
+pub trait ApproxEqRatio : Div<Output = Self> + Sub<Output = Self> + Neg<Output = Self>
+    + PartialOrd + Zero + Sized + Copy
 {
     /// This method tests if `self` and `other` are nearly equal by bounding the
     /// difference between them to some number much less than the larger of the two.
     /// This bound is set as the ratio of the difference to the larger.
     fn approx_eq_ratio(&self, other: &Self, ratio: Self) -> bool {
+
+        // Not equal if signs are not equal
         if *self < Self::zero() && *other > Self::zero() { return false; }
         if *self > Self::zero() && *other < Self::zero() { return false; }
 
-        if *self == Self::zero() {
-            if *other == Self::zero() { return true; }
-            else { return false; }
-        }
-        if *other == Self::zero() {
-            if *self == Self::zero() { return true; }
-            else { return false; }
+        // Handle all zero cases
+        match (*self == Self::zero(), *other == Self::zero()) {
+            (true,true) => return true,
+            (true,false) => return false,
+            (false,true) => return false,
+            _ => { }
         }
 
-        let (smaller,larger) = if *self < *other {
-            (self,other)
+        // abs
+        let (s,o) = if *self < Self::zero() {
+            (-*self, -*other)
         } else {
-            (other,self)
+            (*self, *other)
         };
-        let difference: Self = larger.sub(*smaller);
-        let actual_ratio: Self = difference.div(*larger);
+
+        let (smaller,larger) = if s < o {
+            (s,o)
+        } else {
+            (o,s)
+        };
+        let difference: Self = larger.sub(smaller);
+        let actual_ratio: Self = difference.div(larger);
         actual_ratio < ratio
     }
 
