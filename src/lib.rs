@@ -436,6 +436,16 @@ pub trait ApproxEqRatio : Div<Output = Self> + Sub<Output = Self> + PartialOrd +
     fn approx_eq_ratio(&self, other: &Self, ratio: Self) -> bool {
         if *self < Self::zero() && *other > Self::zero() { return false; }
         if *self > Self::zero() && *other < Self::zero() { return false; }
+
+        if *self == Self::zero() {
+            if *other == Self::zero() { return true; }
+            else { return false; }
+        }
+        if *other == Self::zero() {
+            if *self == Self::zero() { return true; }
+            else { return false; }
+        }
+
         let (smaller,larger) = if *self < *other {
             (self,other)
         } else {
@@ -485,6 +495,14 @@ fn f32_approx_eq_ratio_test_zero_eq_zero_returns_true() {
 fn f32_approx_eq_ratio_test_zero_ne_zero_returns_false() {
     let x: f32 = 0.0_f32;
     assert!(x.approx_ne_ratio(&x,0.1) == false);
+}
+
+#[test]
+fn f32_approx_eq_ratio_test_against_a_zero_is_false() {
+    let x: f32 = 0.0_f32;
+    let y: f32 = 0.1_f32;
+    assert!(x.approx_eq_ratio(&y,0.1) == false);
+    assert!(y.approx_eq_ratio(&x,0.1) == false);
 }
 
 #[test]
