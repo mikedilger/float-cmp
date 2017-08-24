@@ -1,6 +1,6 @@
 [package]
 name = "float-cmp"
-version = "0.2.3"
+version = "0.2.4"
 authors = ["Mike Dilger <mike@mikedilger.com>"]
 description = "Floating point approximate comparison traits"
 repository = "https://github.com/mikedilger/float-cmp"
