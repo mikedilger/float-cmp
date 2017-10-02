@@ -85,8 +85,8 @@ impl Ulps for f32 {
         // two floats are
 
         // Setup integer representations of the input
-        let ai32: i32 = unsafe { mem::transmute(*self) };
-        let bi32: i32 = unsafe { mem::transmute(*other) };
+        let ai32: i32 = unsafe { mem::transmute::<f32,i32>(*self) };
+        let bi32: i32 = unsafe { mem::transmute::<f32,i32>(*other) };
 
         ai32.wrapping_sub(bi32)
     }
@@ -123,6 +123,14 @@ fn f32_ulps_test4() {
     assert!(x.ulps(&y) == 3);
 }
 
+#[test]
+fn f32_ulps_test5() {
+    let x: f32 = 2.0;
+    let ulps: i32 = unsafe { mem::transmute(x) };
+    let x2: f32 = unsafe { mem::transmute(ulps) };
+    assert_eq!(x, x2);
+}
+
 impl Ulps for f64 {
     type U = i64;
 
@@ -135,8 +143,8 @@ impl Ulps for f64 {
         // two floats are
 
         // Setup integer representations of the input
-        let ai64: i64 = unsafe { mem::transmute(*self) };
-        let bi64: i64 = unsafe { mem::transmute(*other) };
+        let ai64: i64 = unsafe { mem::transmute::<f64,i64>(*self) };
+        let bi64: i64 = unsafe { mem::transmute::<f64,i64>(*other) };
 
         ai64.wrapping_sub(bi64)
     }
@@ -173,6 +181,13 @@ fn f64_ulps_test4() {
     assert!(x.ulps(&y) == 3);
 }
 
+#[test]
+fn f64_ulps_test5() {
+    let x: f64 = 2.0;
+    let ulps: i64 = unsafe { mem::transmute(x) };
+    let x2: f64 = unsafe { mem::transmute(ulps) };
+    assert_eq!(x, x2);
+}
 
 /// ApproxEqUlps is a trait for approximate equality comparisons, and is defined only
 /// for floating point types.
@@ -336,21 +351,27 @@ impl ApproxOrdUlps for f32 {
 
         // -0 and +0 are drastically far in ulps terms, so
         // we need a special case for that.
-        if self==other { return Ordering::Equal; }
+        if *self==*other { return Ordering::Equal; }
 
-        // Handle differing signs as a special case, even if
-        // they are very close, most people consider them
-        // unequal.
+        // Handle differing signs as a special case, even if they are very
+        // close, most people consider them unequal.
         if *self>0_f32 && *other<0_f32 { return Ordering::Greater; }
-        if *self<0_f32 && *other>0_f32 { return Ordering::Less }
+        if *self<0_f32 && *other>0_f32 { return Ordering::Less; }
 
         let diff: i32 = self.ulps(other);
-        match diff {
-            x if x > 0 && x <= ulps => Ordering::Equal,
-            x if x > 0 => Ordering::Greater,
-            x if x < 0 && x >= -ulps => Ordering::Equal,
-            x if x < 0 => Ordering::Less,
-            _ => Ordering::Equal
+
+        let ordering = match diff {
+            x if x < -ulps => Ordering::Less,
+            x if x >= -ulps && x < 0 => Ordering::Equal,
+            x if x >= 0 && x <= ulps => Ordering::Equal,
+            x if x > ulps => Ordering::Greater,
+            _ => unreachable!()
+        };
+
+        if *self<0_f32 {
+            ordering.reverse()
+        } else {
+            ordering
         }
     }
 }
@@ -377,6 +398,12 @@ fn f32_approx_cmp_test2() {
     assert!(x.approx_cmp(&y,1) == Ordering::Less);
     assert!(y.approx_cmp(&x,1) == Ordering::Greater);
 }
+#[test]
+fn f32_approx_cmp_negatives() {
+    let x: f32 = -1.0;
+    let y: f32 = -2.0;
+    assert!(x.approx_cmp(&y, 2) == Ordering::Greater);
+}
 
 impl ApproxOrdUlps for f64 {
     fn approx_cmp(&self, other: &f64, ulps: <Self as Ulps>::U) -> Ordering {
@@ -385,19 +412,25 @@ impl ApproxOrdUlps for f64 {
         // we need a special case for that.
         if self==other { return Ordering::Equal; }
 
-        // Handle differing signs as a special case, even if
-        // they are very close, most people consider them
-        // unequal.
+        // Handle differing signs as a special case, even if they are very
+        // close, most people consider them unequal.
         if *self>0_f64 && *other<0_f64 { return Ordering::Greater; }
         if *self<0_f64 && *other>0_f64 { return Ordering::Less }
 
         let diff: i64 = self.ulps(other);
-        match diff {
-            x if x > 0 && x <= ulps => Ordering::Equal,
-            x if x > 0 => Ordering::Greater,
-            x if x < 0 && x >= -ulps => Ordering::Equal,
-            x if x < 0 => Ordering::Less,
-            _ => Ordering::Equal
+
+        let ordering =  match diff {
+            x if x < -ulps => Ordering::Less,
+            x if x >= -ulps && x < 0 => Ordering::Equal,
+            x if x >= 0 && x <= ulps => Ordering::Equal,
+            x if x > ulps => Ordering::Greater,
+            _ => unreachable!()
+        };
+
+        if *self<0_f64 {
+            ordering.reverse()
+        } else {
+            ordering
         }
     }
 }
@@ -423,6 +456,12 @@ fn f64_approx_cmp_test2() {
     assert!(x.approx_cmp(&y,3) == Ordering::Equal);
     assert!(x.approx_cmp(&y,2) == Ordering::Less);
     assert!(y.approx_cmp(&x,2) == Ordering::Greater);
+}
+#[test]
+fn f64_approx_cmp_negatives() {
+    let x: f64 = -1.0;
+    let y: f64 = -2.0;
+    assert!(x.approx_cmp(&y, 2) == Ordering::Greater);
 }
 
 /// ApproxEqRatio is a trait for approximate equality comparisons bounding the ratio
@@ -560,4 +599,3 @@ fn f64_approx_eq_ratio_test_negative_numbers() {
     // -3 and -4 should not be equal at a ratio of 0.1
     assert!(x.approx_eq_ratio(&y,0.1) == false);
 }
-
