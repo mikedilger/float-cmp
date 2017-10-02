@@ -61,6 +61,7 @@ use num::Zero;
 use std::mem;
 use std::cmp::{Ordering,PartialOrd};
 use std::ops::{Sub,Div,Neg};
+use std::num::{FpCategory};
 
 /// A trait for floating point numbers which computes the number of representable
 /// values or ULPs (Units of Least Precision) that separate the two given values.
@@ -349,29 +350,32 @@ pub trait ApproxOrdUlps: ApproxEqUlps {
 impl ApproxOrdUlps for f32 {
     fn approx_cmp(&self, other: &f32, ulps: <Self as Ulps>::U) -> Ordering {
 
+        let selfclass = self.classify();
+        let otherclass = other.classify();
+
         // -0 and +0 are drastically far in ulps terms, so
         // we need a special case for that.
-        if *self==*other { return Ordering::Equal; }
+        if selfclass==FpCategory::Zero && otherclass==FpCategory::Zero {
+            return Ordering::Equal;
+        }
 
         // Handle differing signs as a special case, even if they are very
         // close, most people consider them unequal.
-        if *self>0_f32 && *other<0_f32 { return Ordering::Greater; }
-        if *self<0_f32 && *other>0_f32 { return Ordering::Less; }
+        let self_pos = self.is_sign_positive();
+        let other_pos = other.is_sign_positive();
 
-        let diff: i32 = self.ulps(other);
-
-        let ordering = match diff {
-            x if x < -ulps => Ordering::Less,
-            x if x >= -ulps && x < 0 => Ordering::Equal,
-            x if x >= 0 && x <= ulps => Ordering::Equal,
-            x if x > ulps => Ordering::Greater,
-            _ => unreachable!()
+        let udiff: i32 = match (self_pos, other_pos) {
+            (true, false) => return Ordering::Greater,
+            (false, true) => return Ordering::Less,
+            (true, true) => self.ulps(other),
+            (false, false) => other.ulps(self), // invert ulps for negatives
         };
 
-        if *self<0_f32 {
-            ordering.reverse()
-        } else {
-            ordering
+        match udiff {
+            x if x < -ulps => Ordering::Less,
+            x if x >= -ulps && x <= ulps => Ordering::Equal,
+            x if x > ulps => Ordering::Greater,
+            _ => unreachable!()
         }
     }
 }
@@ -405,32 +409,79 @@ fn f32_approx_cmp_negatives() {
     assert!(x.approx_cmp(&y, 2) == Ordering::Greater);
 }
 
+// In all cases, approx_cmp() should be the same as cmp() if ulps=0
+#[test]
+fn f32_approx_cmp_vs_partial_cmp() {
+    let testcases: [u32; 20] = [
+        0,          // +0
+        0x80000000, // -0
+        0x00000101, // + denormal
+        0x80000101, // - denormal
+        0x00001101, // + denormal
+        0x80001101, // - denormal
+        0x01000101, // + normal
+        0x81000101, // - normal
+        0x01001101, // + normal
+        0x81001101, // - normal
+        0x7F800000, // +infinity
+        0xFF800000, // -infinity
+        0x7F801101, // SNaN
+        0xFF801101, // SNaN
+        0x7FC01101, // QNaN
+        0xFFC01101, // QNaN
+        0x7F801110, // SNaN
+        0xFF801110, // SNaN
+        0x7FC01110, // QNaN
+        0xFFC01110, // QNaN
+
+    ];
+
+    let mut xf: f32;
+    let mut yf: f32;
+    for xbits in testcases.iter() {
+        for ybits in testcases.iter() {
+            xf = unsafe { mem::transmute::<u32,f32>(*xbits) };
+            yf = unsafe { mem::transmute::<u32,f32>(*ybits) };
+            if let Some(ordering) = xf.partial_cmp(&yf) {
+                if ordering != xf.approx_cmp(&yf, 0) {
+                    panic!("{} ({:x}) vs {} ({:x}): partial_cmp gives {:?} approx_cmp gives {:?}",
+                           xf, xbits, yf, ybits, ordering , xf.approx_cmp(&yf, 0));
+                }
+            }
+        }
+        print!(".");
+    }
+}
+
 impl ApproxOrdUlps for f64 {
     fn approx_cmp(&self, other: &f64, ulps: <Self as Ulps>::U) -> Ordering {
 
+        let selfclass = self.classify();
+        let otherclass = other.classify();
+
         // -0 and +0 are drastically far in ulps terms, so
         // we need a special case for that.
-        if self==other { return Ordering::Equal; }
+        if selfclass==FpCategory::Zero && otherclass==FpCategory::Zero {
+            return Ordering::Equal;
+        }
 
         // Handle differing signs as a special case, even if they are very
         // close, most people consider them unequal.
-        if *self>0_f64 && *other<0_f64 { return Ordering::Greater; }
-        if *self<0_f64 && *other>0_f64 { return Ordering::Less }
+        let self_pos = self.is_sign_positive();
+        let other_pos = other.is_sign_positive();
 
-        let diff: i64 = self.ulps(other);
-
-        let ordering =  match diff {
-            x if x < -ulps => Ordering::Less,
-            x if x >= -ulps && x < 0 => Ordering::Equal,
-            x if x >= 0 && x <= ulps => Ordering::Equal,
-            x if x > ulps => Ordering::Greater,
-            _ => unreachable!()
+        let udiff: i64 = match (self_pos, other_pos) {
+            (true, false) => return Ordering::Greater,
+            (false, true) => return Ordering::Less,
+            (true, true) => self.ulps(other),
+            (false, false) => other.ulps(self), // invert ulps for negatives
         };
 
-        if *self<0_f64 {
-            ordering.reverse()
-        } else {
-            ordering
+        match udiff {
+            x if x < -ulps => Ordering::Less,
+            x if x >= -ulps && x <= ulps => Ordering::Equal,
+            x if x > ulps => Ordering::Greater,
+            _ => unreachable!()
         }
     }
 }
@@ -462,6 +513,49 @@ fn f64_approx_cmp_negatives() {
     let x: f64 = -1.0;
     let y: f64 = -2.0;
     assert!(x.approx_cmp(&y, 2) == Ordering::Greater);
+}
+
+// In all cases, approx_cmp() should be the same as cmp() if ulps=0
+#[test]
+fn f64_approx_cmp_vs_partial_cmp() {
+    let testcases: [u64; 20] = [
+        0,                   // +0
+        0x80000000_00000000, // -0
+        0x00000010_10000000, // + denormal
+        0x80000010_10000000, // - denormal
+        0x00000110_10000000, // + denormal
+        0x80000110_10000000, // - denormal
+        0x01000101_00100100, // + normal
+        0x81000101_00100100, // - normal
+        0x01001101_00100100, // + normal
+        0x81001101_00100100, // - normal
+        0x7FF00000_00000000, // +infinity
+        0xFFF00000_00000000, // -infinity
+        0x7FF01101_00100100, // SNaN
+        0xFFF01101_00100100, // SNaN
+        0x7FF81101_00100100, // QNaN
+        0xFFF81101_00100100, // QNaN
+        0x7FF01110_00100100, // SNaN
+        0xFFF01110_00100100, // SNaN
+        0x7FF81110_00100100, // QNaN
+        0xFFF81110_00100100, // QNaN
+    ];
+
+    let mut xf: f64;
+    let mut yf: f64;
+    for xbits in testcases.iter() {
+        for ybits in testcases.iter() {
+            xf = unsafe { mem::transmute::<u64,f64>(*xbits) };
+            yf = unsafe { mem::transmute::<u64,f64>(*ybits) };
+            if let Some(ordering) = xf.partial_cmp(&yf) {
+                if ordering != xf.approx_cmp(&yf, 0) {
+                    panic!("{} ({:x}) vs {} ({:x}): partial_cmp gives {:?} approx_cmp gives {:?}",
+                           xf, xbits, yf, ybits, ordering , xf.approx_cmp(&yf, 0));
+                }
+            }
+        }
+        print!(".");
+    }
 }
 
 /// ApproxEqRatio is a trait for approximate equality comparisons bounding the ratio
