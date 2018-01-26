@@ -70,7 +70,7 @@ use std::num::{FpCategory};
 /// A trait for floating point numbers which computes the number of representable
 /// values or ULPs (Units of Least Precision) that separate the two given values.
 pub trait Ulps {
-    type U;
+    type U: Copy;
 
     /// The number of representable values or ULPs (Units of Least Precision) that
     /// separate `self` and `other`.  The result `U` is an integral value, and will
@@ -194,22 +194,28 @@ fn f64_ulps_test5() {
     assert_eq!(x, x2);
 }
 
-/// ApproxEqUlps is a trait for approximate equality comparisons, and is defined only
-/// for floating point types.
-pub trait ApproxEqUlps : Ulps {
+/// ApproxEqUlps is a trait for approximate equality comparisons.
+/// The associated type Flt is a floating point type which implements Ulps, and is
+/// required so that this trait can be implemented for compound types (e.g. vectors),
+/// not just for the floats themselves.
+pub trait ApproxEqUlps {
+    type Flt: Ulps;
+
     /// This method tests for `self` and `other` values to be approximately equal
     /// within ULPs (Units of Least Precision) floating point representations.
-    fn approx_eq_ulps(&self, other: &Self, ulps: <Self as Ulps>::U) -> bool;
+    fn approx_eq_ulps(&self, other: &Self, ulps: <Self::Flt as Ulps>::U) -> bool;
 
     /// This method tests for `self` and `other` values to be not approximately
     /// equal within ULPs (Units of Least Precision) floating point representations.
     #[inline]
-    fn approx_ne_ulps(&self, other: &Self, ulps: <Self as Ulps>::U) -> bool {
+    fn approx_ne_ulps(&self, other: &Self, ulps: <Self::Flt as Ulps>::U) -> bool {
         !self.approx_eq_ulps(other, ulps)
     }
 }
 
 impl ApproxEqUlps for f32 {
+    type Flt = f32;
+
     fn approx_eq_ulps(&self, other: &f32, ulps: i32) -> bool {
         // -0 and +0 are drastically far in ulps terms, so
         // we need a special case for that.
@@ -253,6 +259,8 @@ fn f32_approx_eq_test_zeroes() {
 }
 
 impl ApproxEqUlps for f64 {
+    type Flt = f64;
+
     fn approx_eq_ulps(&self, other: &f64, ulps: i64) -> bool {
         // -0 and +0 are drastically far in ulps terms, so
         // we need a special case for that.
@@ -302,13 +310,16 @@ pub trait ApproxOrdUlps: ApproxEqUlps {
     /// if one exists, where Equal is returned if they are approximately
     /// equal within `ulps` floating point representations.  See module
     /// documentation for an understanding of `ulps`
-    fn approx_cmp(&self, other: &Self, ulps: <Self as Ulps>::U) -> Ordering;
+    fn approx_cmp(&self, other: &Self, ulps: <<Self as ApproxEqUlps>::Flt as Ulps>::U)
+                  -> Ordering;
 
     /// This method tests less than (for `self` < `other`), where values
     /// within `ulps` of each other are not less than.  See module
     /// documentation for an understanding of `ulps`.
     #[inline]
-    fn approx_lt(&self, other: &Self, ulps: <Self as Ulps>::U) -> bool {
+    fn approx_lt(&self, other: &Self, ulps: <<Self as ApproxEqUlps>::Flt as Ulps>::U)
+                 -> bool
+    {
         match self.approx_cmp(other, ulps) {
             Ordering::Less => true,
             _ => false,
@@ -319,7 +330,9 @@ pub trait ApproxOrdUlps: ApproxEqUlps {
     /// where values within `ulps` are equal.  See module documentation
     /// for an understanding of `ulps`.
     #[inline]
-    fn approx_le(&self, other: &Self, ulps: <Self as Ulps>::U) -> bool {
+    fn approx_le(&self, other: &Self, ulps: <<Self as ApproxEqUlps>::Flt as Ulps>::U)
+                 -> bool
+    {
         match self.approx_cmp(other, ulps) {
             Ordering::Less | Ordering::Equal => true,
             _ => false,
@@ -330,7 +343,9 @@ pub trait ApproxOrdUlps: ApproxEqUlps {
     /// where values within `ulps` are not greater than.  See module
     /// documentation for an understanding of `ulps`
     #[inline]
-    fn approx_gt(&self, other: &Self, ulps: <Self as Ulps>::U) -> bool {
+    fn approx_gt(&self, other: &Self, ulps: <<Self as ApproxEqUlps>::Flt as Ulps>::U)
+                 -> bool
+    {
         match self.approx_cmp(other, ulps) {
             Ordering::Greater => true,
             _ => false,
@@ -341,7 +356,9 @@ pub trait ApproxOrdUlps: ApproxEqUlps {
     /// where values within `ulps` are equal.  See module documentation
     /// for an understanding of `ulps`.
     #[inline]
-    fn approx_ge(&self, other: &Self, ulps: <Self as Ulps>::U) -> bool {
+    fn approx_ge(&self, other: &Self, ulps: <<Self as ApproxEqUlps>::Flt as Ulps>::U)
+                 -> bool
+    {
         match self.approx_cmp(other, ulps) {
             Ordering::Greater | Ordering::Equal => true,
             _ => false,
@@ -350,8 +367,9 @@ pub trait ApproxOrdUlps: ApproxEqUlps {
 }
 
 impl ApproxOrdUlps for f32 {
-    fn approx_cmp(&self, other: &f32, ulps: <Self as Ulps>::U) -> Ordering {
-
+    fn approx_cmp(&self, other: &f32, ulps: <<Self as ApproxEqUlps>::Flt as Ulps>::U)
+                  -> Ordering
+    {
         let selfclass = self.classify();
         let otherclass = other.classify();
 
@@ -456,8 +474,9 @@ fn f32_approx_cmp_vs_partial_cmp() {
 }
 
 impl ApproxOrdUlps for f64 {
-    fn approx_cmp(&self, other: &f64, ulps: <Self as Ulps>::U) -> Ordering {
-
+    fn approx_cmp(&self, other: &f64, ulps: <<Self as ApproxEqUlps>::Flt as Ulps>::U)
+                  -> Ordering
+    {
         let selfclass = self.classify();
         let otherclass = other.classify();
 
