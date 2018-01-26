@@ -214,8 +214,7 @@ impl ApproxEqUlps for f32 {
         // Handle differing signs as a special case, even if
         // they are very close, most people consider them
         // unequal.
-        if *self>0_f32 && *other<0_f32 { return false; }
-        if *self<0_f32 && *other>0_f32 { return false; }
+        if self.is_sign_positive() != other.is_sign_positive() { return false; }
 
         let diff: i32 = self.ulps(other);
         diff >= -ulps && diff <= ulps
@@ -258,8 +257,7 @@ impl ApproxEqUlps for f64 {
         // Handle differing signs as a special case, even if
         // they are very close, most people consider them
         // unequal.
-        if *self>0_f64 && *other<0_f64 { return false; }
-        if *self<0_f64 && *other>0_f64 { return false; }
+        if self.is_sign_positive() != other.is_sign_positive() { return false; }
 
         let diff: i64 = self.ulps(other);
         diff >= -ulps && diff <= ulps
