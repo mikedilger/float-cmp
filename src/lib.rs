@@ -58,6 +58,27 @@
 //! Fixed epsilon systems of comparison tend to work well only on numbers within certain ranges.
 //! It may seem reasonable to expect numbers that differ by less than 0.000001 to be equal, but
 //! this does not always work well (consider comparing -0.0000000028 to +0.00000097).
+//!
+//! You can implement `ApproxEqUlps` for your own complex types. The trait and type parameter
+//! notation can be a bit tricky, so here is an example:
+//!
+//! ```
+//! use float_cmp::{ApproxEqUlps, Ulps};
+//!
+//! pub struct Vec2<F> {
+//!   pub x: F,
+//!   pub y: F,
+//! }
+//!
+//! impl<F: Ulps + ApproxEqUlps<Flt=F>> ApproxEqUlps for Vec2<F> {
+//!   type Flt = F;
+//!
+//!   fn approx_eq_ulps(&self, other: &Self, ulps: <<F as ApproxEqUlps>::Flt as Ulps>::U) -> bool {
+//!     self.x.approx_eq_ulps(&other.x, ulps)
+//!       && self.y.approx_eq_ulps(&other.y, ulps)
+//!   }
+//! }
+//! ```
 
 extern crate num;
 use num::Zero;
