@@ -97,6 +97,8 @@ pub trait Ulps {
     /// separate `self` and `other`.  The result `U` is an integral value, and will
     /// be zero if `self` and `other` are exactly equal.
     fn ulps(&self, other: &Self) -> <Self as Ulps>::U;
+
+    fn default_ulps() -> <Self as Ulps>::U;
 }
 
 impl Ulps for f32 {
@@ -116,6 +118,8 @@ impl Ulps for f32 {
 
         ai32.wrapping_sub(bi32)
     }
+
+    fn default_ulps() -> i32 { 10 }
 }
 
 #[test]
@@ -174,6 +178,8 @@ impl Ulps for f64 {
 
         ai64.wrapping_sub(bi64)
     }
+
+    fn default_ulps() -> i64 { 20 }
 }
 
 #[test]
