@@ -80,8 +80,8 @@
 //! }
 //! ```
 
-extern crate num;
-use num::{Zero, NumCast};
+extern crate num_traits;
+use num_traits::{Zero, NumCast};
 
 use std::mem;
 use std::cmp::{Ordering,PartialOrd};
