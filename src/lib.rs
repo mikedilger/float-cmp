@@ -91,5 +91,8 @@ pub use self::ulps_eq::ApproxEqUlps;
 mod ulps_ord;
 pub use self::ulps_ord::ApproxOrdUlps;
 
+mod eq;
+pub use self::eq::ApproxEq;
+
 mod ratio;
 pub use self::ratio::ApproxEqRatio;
