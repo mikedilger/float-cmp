@@ -1,4 +1,4 @@
-// Copyright 2014 Optimal Computing (NZ) Ltd.
+// Copyright 2014-2018 Optimal Computing (NZ) Ltd.
 // Licensed under the MIT license.  See LICENSE for details.
 
 //! float-cmp defines traits for approximate comparison of floating point types which have fallen
