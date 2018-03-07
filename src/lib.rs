@@ -7,16 +7,17 @@
 //! away from exact equality due to the limited precision available within floating point
 //! representations. Implementations of these traits are provided for `f32` and `f64` types.
 //!
-//! Three methods of comparison are provided, but we recommend using the `ApproxEq` trait.
-//! We have left the other traits in the library for compatability and until we are certain that
-//! ApproxEq covers everything.
+//! The recommended go-to solution (although it may not be appropriate in all cases) is the
+//! `approx_eq()` function in the `ApproxEq` trait.  An epsilon test is performed first, which
+//! handles very small numbers, zeroes, and differing signs of very small numbers, considering
+//! them equal if the difference is less than the given epsilon (e.g. f32::EPSILON). For larger
+//! numbers, floating point representations are spaced further apart, and in these cases the ulps
+//! test comes to the rescue. Numbers are considered equal if the number of floating point
+//! representations between them is below a specified bound (Ulps are a cardinal count of
+//! floating point representations that separate two floating point numbers).
 //!
-//! ApproxEq compares two floating point numbers by selecting one of two techniques, depending
-//! on the case. For two non-zero numbers of the same sign, the number of floating point
-//! representations that separate them are counted (an integer number), and must fall below
-//! a specifed bound that the caller supplies. This is an extremely fast operation. In all other
-//! cases, the difference between the two numbers (absolute) must be less than a given epsilon
-//! that the caller supplies.
+//! Several other traits are provided including `Ulps`, `ApproxEqUlps`, `ApproxOrdUlps`, and
+//! `ApproxEqRatio`.
 //!
 //! ## The problem
 //!
