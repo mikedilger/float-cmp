@@ -51,7 +51,7 @@
 //!   let a = 0.15_f32 + 0.15_f32 + 0.15_f32;
 //!   let b = 0.1_f32 + 0.1_f32 + 0.25_f32;
 //!   println!("{} == {}", a, b);
-//!   assert!(a.approx_eq(&b, 2, 2.0 * ::std::f32::EPSILON)) // They are equal, within 2 ulps
+//!   assert!(a.approx_eq(&b, 2.0 * ::std::f32::EPSILON, 2)) // They are equal, within 2 ulps
 //!   # }
 //! ```
 //!
@@ -90,11 +90,12 @@
 //! impl<F: Ulps + ApproxEq<Flt=F> + Copy> ApproxEq for Vec2<F> {
 //!   type Flt = F;
 //!
-//!   fn approx_eq(&self, other: &Self, ulps: <<F as ApproxEq>::Flt as Ulps>::U,
-//!                epsilon: <F as ApproxEq>::Flt) -> bool
+//!   fn approx_eq(&self, other: &Self,
+//!                epsilon: <F as ApproxEq>::Flt,
+//!                ulps: <<F as ApproxEq>::Flt as Ulps>::U) -> bool
 //!   {
-//!     self.x.approx_eq(&other.x, ulps, epsilon)
-//!       && self.y.approx_eq(&other.y, ulps, epsilon)
+//!     self.x.approx_eq(&other.x, epsilon, ulps)
+//!       && self.y.approx_eq(&other.y, epsilon, ulps)
 //!   }
 //! }
 //! ```
