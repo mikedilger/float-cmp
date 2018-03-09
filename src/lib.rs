@@ -3,6 +3,9 @@
 
 //! # float-cmp
 //!
+//! WARNING: comparing floating point numbers is very tricky and situation dependent, and
+//! best avoided if at all possible. There is no panacea that "just works".
+//!
 //! float-cmp defines traits for approximate comparison of floating point types which have fallen
 //! away from exact equality due to the limited precision available within floating point
 //! representations. Implementations of these traits are provided for `f32` and `f64` types.
@@ -56,9 +59,9 @@
 //!   # }
 //! ```
 //!
-//! I recommend you use a small integer for the `ulps` parameter (2 to 10 or so), and a
-//! similar small multiple of the floating point's EPSILON constant (2.0 to 10.0 or so),
-//! but please send feedback if you think you have better advice.
+//! For most cases, I recommend you use a smallish integer for the `ulps` parameter (1 to 5
+//! or so), and a similar small multiple of the floating point's EPSILON constant (1.0 to 5.0
+//! or so), but there are *plenty* of cases where this is insufficient.
 //!
 //! ## Some explanation
 //!
