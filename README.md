@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/mikedilger/float-cmp.svg?branch=master)](https://travis-ci.org/mikedilger/float-cmp)
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
-Documentation is available at https://mikedilger.github.io/float-cmp
+Documentation is available at https://docs.rs/float-cmp
 
 
 float-cmp defines traits for approximate comparison of floating point types which have fallen
