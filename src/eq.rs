@@ -21,6 +21,23 @@ pub trait ApproxEq {
     }
 }
 
+/// This type defines a margin within two f32s might be considered equal
+/// and is intended as the associated type for the `ApproxEq` trait.
+///
+/// Two methods are used to determine approximate equality.
+///
+/// First an epsilon method is used, considering them approximately equal if they
+/// differ by <= `epsilon`.  This will only succeed for very small numbers.
+/// Note that it may succeed even if the parameters are of differing signs straddling
+/// zero.
+///
+/// The second method considers how many ULPs (units of least precision, units in
+/// the last place, which is the integer number of floating point representations
+/// that the parameters are separated by) different the parameters are and considers
+/// them approximately equal if this is <= `ulps`. For large floating point numbers,
+/// an ULP can be a rather large gap, but this kind of comparison is necessary
+/// because floating point operations must round to the nearest representable value
+/// and so larger floating point values accumulate larger errors.
 #[derive(Debug, Clone)]
 pub struct F32Margin {
     pub epsilon: f32,
@@ -110,6 +127,23 @@ fn f32_approx_eq_test6() {
     assert!(x.approx_eq(&y, &F32Margin { epsilon: 1000.0 * f32::EPSILON, ulps: 0}) == false);
 }
 
+/// This type defines a margin within two f32s might be considered equal
+/// and is intended as the associated type for the `ApproxEq` trait.
+///
+/// Two methods are used to determine approximate equality.
+///
+/// First an epsilon method is used, considering them approximately equal if they
+/// differ by <= `epsilon`.  This will only succeed for very small numbers.
+/// Note that it may succeed even if the parameters are of differing signs straddling
+/// zero.
+///
+/// The second method considers how many ULPs (units of least precision, units in
+/// the last place, which is the integer number of floating point representations
+/// that the parameters are separated by) different the parameters are and considers
+/// them approximately equal if this <= `ulps`. For large floating point numbers,
+/// an ULP can be a rather large gap, but this kind of comparison is necessary
+/// because floating point operations must round to the nearest representable value
+/// and so larger floating point values accumulate larger errors.
 #[derive(Debug, Clone)]
 pub struct F64Margin {
     pub epsilon: f64,

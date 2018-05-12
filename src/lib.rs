@@ -3,21 +3,25 @@
 
 //! # float-cmp
 //!
-//! WARNING: comparing floating point numbers is very tricky and situation dependent, and
-//! best avoided if at all possible. There is no panacea that "just works".
+//! float-cmp defines and implements traits for approximate comparison of floating point types
+//! which have fallen away from exact equality due to the limited precision available within
+//! floating point representations. Implementations of these traits are provided for `f32`
+//! and `f64` types.
 //!
-//! float-cmp defines traits for approximate comparison of floating point types which have fallen
-//! away from exact equality due to the limited precision available within floating point
-//! representations. Implementations of these traits are provided for `f32` and `f64` types.
+//! When I was a kid in the '80s, the programming rule was "Never compare floating point
+//! numbers". If you can follow that rule and still get the outcome you desire, then more
+//! power to you. However, if you really do need to compare them, this crate provides a
+//! reasonable way to do so.
+//!
+//! Another crate `efloat` (which as of this writing is still undergoing considerable
+//! development) offers another solution by providing a floating point type that tracks its
+//! error bounds as operations are performed on it, and thus can implement the `ApproxEq`
+//! trait in this crate more accurately, without specifying a `Margin`.
 //!
 //! The recommended go-to solution (although it may not be appropriate in all cases) is the
-//! `approx_eq()` function in the `ApproxEq` trait.  An epsilon test is performed first, which
-//! handles very small numbers, zeroes, and differing signs of very small numbers, considering
-//! them equal if the difference is less than the given epsilon (e.g. f32::EPSILON). For larger
-//! numbers, floating point representations are spaced further apart, and in these cases the ulps
-//! test comes to the rescue. Numbers are considered equal if the number of floating point
-//! representations between them is below a specified bound (Ulps are a cardinal count of
-//! floating point representations that separate two floating point numbers).
+//! `approx_eq()` function in the `ApproxEq` trait.  For `f32` and `f64`, the `F32Margin`
+//! and `F64Margin` types are provided for specifying margins as both an epsilon value and
+//! an ULPs value, and defaults are provided via `Default`.
 //!
 //! Several other traits are provided including `Ulps`, `ApproxEqUlps`, `ApproxOrdUlps`, and
 //! `ApproxEqRatio`.
@@ -74,25 +78,21 @@
 //! because as numbers fall away from equality due to the imprecise nature of their representation,
 //! they fall away in ULPs terms, not in absolute terms.  Pure epsilon-based comparisons are
 //! absolute and thus don't map well to the nature of the additive error issue. They work fine
-//! for many ranges of numbers, but not for others (consider comparing -0.0000000028
-//! to +0.00000097).
+//! for many ranges of numbers, but not for others.
 //!
 //! ## Implementing these traits
 //!
-//! You can implement `ApproxEq` for your own complex types. The trait and type parameter
-//! notation can be a bit tricky, especially if your type is type parameterized around
-//! floating point types.  So here is an example (you'll probably not specify the Copy trait
-//! directly, but use some other NumTraits type floating point trait):
+//! You can implement `ApproxEq` for your own complex types like this:
 //!
 //! ```
-//! use float_cmp::{Ulps, ApproxEq};
+//! use float_cmp::ApproxEq;
 //!
 //! pub struct Vec2<F> {
 //!   pub x: F,
 //!   pub y: F,
 //! }
 //!
-//! impl<M, F: Ulps + ApproxEq<Margin=M> + Copy> ApproxEq for Vec2<F> {
+//! impl<M, F: ApproxEq<Margin=M>> ApproxEq for Vec2<F> {
 //!   type Margin = M;
 //!
 //!   fn approx_eq(&self, other: &Self, margin: &M) -> bool
