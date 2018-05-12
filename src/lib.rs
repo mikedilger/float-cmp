@@ -50,12 +50,13 @@
 //!
 //! ```
 //!   # extern crate float_cmp;
-//!   # use float_cmp::ApproxEq;
+//!   # use float_cmp::{ApproxEq, F32Margin};
 //!   # fn main() {
 //!   let a = 0.15_f32 + 0.15_f32 + 0.15_f32;
 //!   let b = 0.1_f32 + 0.1_f32 + 0.25_f32;
 //!   println!("{} == {}", a, b);
-//!   assert!(a.approx_eq(&b, 2.0 * ::std::f32::EPSILON, 2)) // They are equal, within 2 ulps
+//!   // They are equal, within 2 ulps
+//!   assert!(a.approx_eq(&b, &F32Margin { epsilon: 0.0, ulps: 2}))
 //!   # }
 //! ```
 //!
@@ -91,15 +92,13 @@
 //!   pub y: F,
 //! }
 //!
-//! impl<F: Ulps + ApproxEq<Flt=F> + Copy> ApproxEq for Vec2<F> {
-//!   type Flt = F;
+//! impl<M, F: Ulps + ApproxEq<Margin=M> + Copy> ApproxEq for Vec2<F> {
+//!   type Margin = M;
 //!
-//!   fn approx_eq(&self, other: &Self,
-//!                epsilon: <F as ApproxEq>::Flt,
-//!                ulps: <<F as ApproxEq>::Flt as Ulps>::U) -> bool
+//!   fn approx_eq(&self, other: &Self, margin: &M) -> bool
 //!   {
-//!     self.x.approx_eq(&other.x, epsilon, ulps)
-//!       && self.y.approx_eq(&other.y, epsilon, ulps)
+//!     self.x.approx_eq(&other.x, margin)
+//!       && self.y.approx_eq(&other.y, margin)
 //!   }
 //! }
 //! ```
@@ -122,7 +121,7 @@ mod ulps_ord;
 pub use self::ulps_ord::ApproxOrdUlps;
 
 mod eq;
-pub use self::eq::ApproxEq;
+pub use self::eq::{ApproxEq, F32Margin, F64Margin};
 
 mod ratio;
 pub use self::ratio::ApproxEqRatio;

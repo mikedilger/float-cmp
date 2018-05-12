@@ -6,7 +6,8 @@ use std::num::{FpCategory};
 use super::{Ulps, ApproxEqUlps};
 
 /// ApproxOrdUlps is for sorting floating point values where approximate equality
-/// is considered equal.
+/// is considered equal.  This is only really useful for types which cannot
+/// implement Ord
 pub trait ApproxOrdUlps: ApproxEqUlps {
     /// This method returns an ordering between `self` and `other` values
     /// if one exists, where Equal is returned if they are approximately
