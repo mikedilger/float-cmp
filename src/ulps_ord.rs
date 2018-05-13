@@ -8,6 +8,10 @@ use super::{Ulps, ApproxEqUlps};
 /// ApproxOrdUlps is for sorting floating point values where approximate equality
 /// is considered equal.  This is only really useful for types which cannot
 /// implement Ord
+///
+/// This is deprecated. If you are using this type, please contact the author and
+/// explain how it is useful.
+#[deprecated(since = "0.5.0", note="types that can implement this can implement PartialOrd")]
 pub trait ApproxOrdUlps: ApproxEqUlps {
     /// This method returns an ordering between `self` and `other` values
     /// if one exists, where Equal is returned if they are approximately
@@ -69,6 +73,7 @@ pub trait ApproxOrdUlps: ApproxEqUlps {
     }
 }
 
+#[allow(deprecated)]
 impl ApproxOrdUlps for f32 {
     fn approx_cmp_ulps(&self, other: &f32, ulps: <<Self as ApproxEqUlps>::Flt as Ulps>::U)
                        -> Ordering
@@ -104,6 +109,7 @@ impl ApproxOrdUlps for f32 {
 }
 
 #[test]
+#[allow(deprecated)]
 fn f32_approx_cmp_test1() {
     let f: f32 = 0.1_f32;
     let mut sum: f32 = 0.0_f32;
@@ -116,6 +122,7 @@ fn f32_approx_cmp_test1() {
     assert!(product.approx_cmp_ulps(&sum,0) != Ordering::Equal);
 }
 #[test]
+#[allow(deprecated)]
 fn f32_approx_cmp_test2() {
     let x: f32 = 1000000_f32;
     let y: f32 = 1000000.1_f32;
@@ -126,6 +133,7 @@ fn f32_approx_cmp_test2() {
     assert!(y.approx_cmp_ulps(&x,1) == Ordering::Greater);
 }
 #[test]
+#[allow(deprecated)]
 fn f32_approx_cmp_negatives() {
     let x: f32 = -1.0;
     let y: f32 = -2.0;
@@ -134,6 +142,7 @@ fn f32_approx_cmp_negatives() {
 
 // In all cases, approx_cmp() should be the same as cmp() if ulps=0
 #[test]
+#[allow(deprecated)]
 fn f32_approx_cmp_vs_partial_cmp() {
     use std::mem;
 
@@ -179,6 +188,7 @@ fn f32_approx_cmp_vs_partial_cmp() {
     }
 }
 
+#[allow(deprecated)]
 impl ApproxOrdUlps for f64 {
     fn approx_cmp_ulps(&self, other: &f64, ulps: <<Self as ApproxEqUlps>::Flt as Ulps>::U)
                        -> Ordering
@@ -214,6 +224,7 @@ impl ApproxOrdUlps for f64 {
 }
 
 #[test]
+#[allow(deprecated)]
 fn f64_approx_cmp_ulps_test1() {
     let f: f64 = 0.000000001_f64;
     let mut sum: f64 = 0.0_f64;
@@ -226,6 +237,7 @@ fn f64_approx_cmp_ulps_test1() {
     assert!(product.approx_cmp_ulps(&sum,0) != Ordering::Equal);
 }
 #[test]
+#[allow(deprecated)]
 fn f64_approx_cmp_ulps_test2() {
     let x: f64 = 1000000_f64;
     let y: f64 = 1000000.0000000003_f64;
@@ -236,6 +248,7 @@ fn f64_approx_cmp_ulps_test2() {
     assert!(y.approx_cmp_ulps(&x,2) == Ordering::Greater);
 }
 #[test]
+#[allow(deprecated)]
 fn f64_approx_cmp_ulps_negatives() {
     let x: f64 = -1.0;
     let y: f64 = -2.0;
@@ -244,6 +257,7 @@ fn f64_approx_cmp_ulps_negatives() {
 
 // In all cases, approx_cmp_ulps() should be the same as cmp() if ulps=0
 #[test]
+#[allow(deprecated)]
 fn f64_approx_cmp_ulps_vs_partial_cmp() {
     use std::mem;
 

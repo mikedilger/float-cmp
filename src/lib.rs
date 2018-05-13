@@ -118,6 +118,7 @@ mod ulps_eq;
 pub use self::ulps_eq::ApproxEqUlps;
 
 mod ulps_ord;
+#[allow(deprecated)]
 pub use self::ulps_ord::ApproxOrdUlps;
 
 mod eq;
