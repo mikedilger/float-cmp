@@ -13,6 +13,12 @@ pub trait Ulps {
     /// separate `self` and `other`.  The result `U` is an integral value, and will
     /// be zero if `self` and `other` are exactly equal.
     fn ulps(&self, other: &Self) -> <Self as Ulps>::U;
+
+    /// The next representable number above this one
+    fn next(&self) -> Self;
+
+    /// The previous representable number below this one
+    fn prev(&self) -> Self;
 }
 
 impl Ulps for f32 {
@@ -31,6 +37,38 @@ impl Ulps for f32 {
         let bi32: i32 = unsafe { mem::transmute::<f32,i32>(*other) };
 
         ai32.wrapping_sub(bi32)
+    }
+
+    fn next(&self) -> Self {
+        if self.is_infinite() && *self > 0.0 {
+            *self
+        } else if *self == -0.0 && self.is_sign_negative() {
+            0.0
+        } else {
+            let mut u = self.to_bits();
+            if *self >= 0.0 {
+                u += 1;
+            } else {
+                u -= 1;
+            }
+            f32::from_bits(u)
+        }
+    }
+
+    fn prev(&self) -> Self {
+        if self.is_infinite() && *self < 0.0 {
+            *self
+        } else if *self == 0.0 && self.is_sign_positive() {
+            -0.0
+        } else {
+            let mut u = self.to_bits();
+            if *self <= -0.0 {
+                u += 1;
+            } else {
+                u -= 1;
+            }
+            f32::from_bits(u)
+        }
     }
 }
 
@@ -73,6 +111,16 @@ fn f32_ulps_test5() {
     assert_eq!(x, x2);
 }
 
+#[test]
+fn f32_ulps_test6() {
+    let negzero: f32 = -0.;
+    let zero: f32 = 0.;
+    assert_eq!(negzero.next(), zero);
+    assert_eq!(zero.prev(), negzero);
+    assert!(negzero.prev() < 0.0);
+    assert!(zero.next() > 0.0);
+}
+
 impl Ulps for f64 {
     type U = i64;
 
@@ -89,6 +137,38 @@ impl Ulps for f64 {
         let bi64: i64 = unsafe { mem::transmute::<f64,i64>(*other) };
 
         ai64.wrapping_sub(bi64)
+    }
+
+    fn next(&self) -> Self {
+        if self.is_infinite() && *self > 0.0 {
+            *self
+        } else if *self == -0.0 && self.is_sign_negative() {
+            0.0
+        } else {
+            let mut u = self.to_bits();
+            if *self >= 0.0 {
+                u += 1;
+            } else {
+                u -= 1;
+            }
+            f64::from_bits(u)
+        }
+    }
+
+    fn prev(&self) -> Self {
+        if self.is_infinite() && *self < 0.0 {
+            *self
+        } else if *self == 0.0 && self.is_sign_positive() {
+            -0.0
+        } else {
+            let mut u = self.to_bits();
+            if *self <= -0.0 {
+                u += 1;
+            } else {
+                u -= 1;
+            }
+            f64::from_bits(u)
+        }
     }
 }
 
@@ -130,3 +210,14 @@ fn f64_ulps_test5() {
     let x2: f64 = unsafe { mem::transmute(ulps) };
     assert_eq!(x, x2);
 }
+
+#[test]
+fn f64_ulps_test6() {
+    let negzero: f64 = -0.;
+    let zero: f64 = 0.;
+    assert_eq!(negzero.next(), zero);
+    assert_eq!(zero.prev(), negzero);
+    assert!(negzero.prev() < 0.0);
+    assert!(zero.next() > 0.0);
+}
+
