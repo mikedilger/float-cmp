@@ -21,7 +21,8 @@
 //! The recommended go-to solution (although it may not be appropriate in all cases) is the
 //! `approx_eq()` function in the `ApproxEq` trait.  For `f32` and `f64`, the `F32Margin`
 //! and `F64Margin` types are provided for specifying margins as both an epsilon value and
-//! an ULPs value, and defaults are provided via `Default`.
+//! an ULPs value, and defaults are provided via `Default` (although there is no perfect
+//! default value that is always appropriate, so beware).
 //!
 //! Several other traits are provided including `Ulps`, `ApproxEqUlps`, `ApproxOrdUlps`, and
 //! `ApproxEqRatio`.
@@ -36,8 +37,8 @@
 //!   # extern crate float_cmp;
 //!   # use float_cmp::ApproxEq;
 //!   # fn main() {
-//!   let a = 0.15_f32 + 0.15_f32 + 0.15_f32;
-//!   let b = 0.1_f32 + 0.1_f32 + 0.25_f32;
+//!   let a: f32 = 0.15 + 0.15 + 0.15;
+//!   let b: f32 = 0.1 + 0.1 + 0.25;
 //!   println!("{} == {}", a, b);
 //!   assert!(a==b)  // Fails, because they are not exactly equal
 //!   # }
@@ -53,20 +54,17 @@
 //! With `ApproxEq`, we can get the answer we intend:
 //!
 //! ```
+//!   # #[macro_use]
 //!   # extern crate float_cmp;
 //!   # use float_cmp::{ApproxEq, F32Margin};
 //!   # fn main() {
-//!   let a = 0.15_f32 + 0.15_f32 + 0.15_f32;
-//!   let b = 0.1_f32 + 0.1_f32 + 0.25_f32;
+//!   let a: f32 = 0.15 + 0.15 + 0.15;
+//!   let b: f32 = 0.1 + 0.1 + 0.25;
 //!   println!("{} == {}", a, b);
 //!   // They are equal, within 2 ulps
-//!   assert!(a.approx_eq(&b, &F32Margin { epsilon: 0.0, ulps: 2}))
+//!   assert!( approx_eq!(f32, a, b, ulps = 2) );
 //!   # }
 //! ```
-//!
-//! For most cases, I recommend you use a smallish integer for the `ulps` parameter (1 to 5
-//! or so), and a similar small multiple of the floating point's EPSILON constant (1.0 to 5.0
-//! or so), but there are *plenty* of cases where this is insufficient.
 //!
 //! ## Some explanation
 //!
@@ -80,9 +78,63 @@
 //! absolute and thus don't map well to the nature of the additive error issue. They work fine
 //! for many ranges of numbers, but not for others.
 //!
+//! ## Using this crate
+//!
+//! You can use the `ApproxEq` trait directly like so:
+//!
+//! ```
+//!   # extern crate float_cmp;
+//!   # use float_cmp::{ApproxEq, F32Margin};
+//!   # fn main() {
+//!   # let a: f32 = 0.15 + 0.15 + 0.15;
+//!   # let b: f32 = 0.1 + 0.1 + 0.25;
+//!     assert!( a.approx_eq(b, F32Margin { ulps: 2, epsilon: 0.0 }) );
+//!   # }
+//! ```
+//!
+//! We have implemented `From<(f32,i32)>` for `F32Margin` (and similarly for `F64Margin`)
+//! so you can use this shorthand:
+//!
+//! ```
+//!   # extern crate float_cmp;
+//!   # use float_cmp::{ApproxEq, F32Margin};
+//!   # fn main() {
+//!   # let a: f32 = 0.15 + 0.15 + 0.15;
+//!   # let b: f32 = 0.1 + 0.1 + 0.25;
+//!     assert!( a.approx_eq(b, (0.0, 2)) );
+//!   # }
+//! ```
+//!
+//! With macros, it is easier to be explicit about which type of margin you wish to set,
+//! without mentioning the other one (the other one will be zero). But the downside is
+//! that you have to specify the type you are dealing with:
+//!
+//! ```
+//!   # #[macro_use]
+//!   # extern crate float_cmp;
+//!   # use float_cmp::{ApproxEq, F32Margin};
+//!   # fn main() {
+//!   # let a: f32 = 0.15 + 0.15 + 0.15;
+//!   # let b: f32 = 0.1 + 0.1 + 0.25;
+//!     assert!( approx_eq!(f32, a, b, ulps = 2) );
+//!     assert!( approx_eq!(f32, a, b, epsilon = 0.00000003) );
+//!     assert!( approx_eq!(f32, a, b, epsilon = 0.00000003, ulps = 2) );
+//!     assert!( approx_eq!(f32, a, b, (0.0, 2)) );
+//!     assert!( approx_eq!(f32, a, b, F32Margin { epsilon: 0.0, ulps: 2 }) );
+//!     assert!( approx_eq!(f32, a, b, F32Margin::default()) );
+//!     assert!( approx_eq!(f32, a, b) ); // uses the default
+//!   # }
+//! ```
+//!
+//! For most cases, I recommend you use a smallish integer for the `ulps` parameter (1 to 5
+//! or so), and a similar small multiple of the floating point's EPSILON constant (1.0 to 5.0
+//! or so), but there are *plenty* of cases where this is insufficient.
+//!
 //! ## Implementing these traits
 //!
-//! You can implement `ApproxEq` for your own complex types like this:
+//! You can implement `ApproxEq` for your own complex types like shown below.
+//! The floating point type `F` must be `Copy`, but for large types you can implement
+//! it for references to your type as shown.
 //!
 //! ```
 //! use float_cmp::ApproxEq;
@@ -92,16 +144,25 @@
 //!   pub y: F,
 //! }
 //!
-//! impl<M, F: ApproxEq<Margin=M>> ApproxEq for Vec2<F> {
+//! impl<'a, M: Copy, F: Copy + ApproxEq<Margin=M>> ApproxEq for &'a Vec2<F> {
 //!   type Margin = M;
 //!
-//!   fn approx_eq(&self, other: &Self, margin: &M) -> bool
-//!   {
-//!     self.x.approx_eq(&other.x, margin)
-//!       && self.y.approx_eq(&other.y, margin)
+//!   fn approx_eq<T: Into<Self::Margin>>(self, other: Self, margin: T) -> bool {
+//!     let margin = margin.into();
+//!     self.x.approx_eq(other.x, margin)
+//!       && self.y.approx_eq(other.y, margin)
 //!   }
 //! }
 //! ```
+//!
+//! ## Non floating-point types
+//!
+//! `ApproxEq` can be implemented for non floating-point types as well, since `Margin` is
+//! an associated type.
+//!
+//! The `efloat` crate implements (or soon will implement) `ApproxEq` for a compound type
+//! that tracks floating point error bounds by checking if the error bounds overlap.
+//! In that case `type Margin = ()`.
 //!
 //! ## Inspiration
 //!
@@ -110,6 +171,14 @@
 //! [https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/](https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/)
 
 extern crate num_traits;
+
+#[macro_use]
+mod macros;
+
+pub fn trials() {
+    println!("are they approximately equal?: {:?}",
+             approx_eq!(f32, 1.0, 1.0000001));
+}
 
 mod ulps;
 pub use self::ulps::Ulps;
