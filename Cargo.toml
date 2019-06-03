@@ -16,5 +16,8 @@ test = true
 doctest = true
 doc = true
 
+[features]
+default = [ "num-traits" ]
+
 [dependencies]
-num-traits = { version = "0.2", default-features = false }
+num-traits = { version = "0.2", default-features = false, optional = true }

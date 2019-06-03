@@ -2,12 +2,30 @@
 // Licensed under the MIT license.  See LICENSE for details.
 
 use std::mem;
+#[cfg(feature="num_traits")]
 use num_traits::NumCast;
 
 /// A trait for floating point numbers which computes the number of representable
 /// values or ULPs (Units of Least Precision) that separate the two given values.
+#[cfg(feature="num_traits")]
 pub trait Ulps {
     type U: Copy + NumCast;
+
+    /// The number of representable values or ULPs (Units of Least Precision) that
+    /// separate `self` and `other`.  The result `U` is an integral value, and will
+    /// be zero if `self` and `other` are exactly equal.
+    fn ulps(&self, other: &Self) -> <Self as Ulps>::U;
+
+    /// The next representable number above this one
+    fn next(&self) -> Self;
+
+    /// The previous representable number below this one
+    fn prev(&self) -> Self;
+}
+
+#[cfg(not(feature="num_traits"))]
+pub trait Ulps {
+    type U: Copy;
 
     /// The number of representable values or ULPs (Units of Least Precision) that
     /// separate `self` and `other`.  The result `U` is an integral value, and will
