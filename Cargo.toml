@@ -8,6 +8,7 @@ documentation = "https://docs.rs/float-cmp"
 readme = "README.md"
 keywords = [ "float", "comparison", "fuzzy", "approximate" ]
 license = "MIT"
+edition = "2018"
 
 [lib]
 name = "float_cmp"
