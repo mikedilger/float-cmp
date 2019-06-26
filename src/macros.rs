@@ -1,74 +1,51 @@
 
-// approx_eq!(f32, 15.0, 15.1)
-
 #[macro_export]
 macro_rules! approx_eq {
     ($typ:ty, $lhs:expr, $rhs:expr) => {
         {
-            let m: <$typ as ApproxEq>::Margin = Default::default();
-            <$typ as ApproxEq>::approx_eq($lhs, $rhs, m)
+            let m: <$typ as $crate::ApproxEq>::Margin = Default::default();
+            <$typ as $crate::ApproxEq>::approx_eq($lhs, $rhs, m)
         }
     };
     ($typ:ty, $lhs:expr, $rhs:expr $(, $set:ident = $val:expr)*) => {
         {
-            let m = <$typ as ApproxEq>::Margin::zero()$(.$set($val))*;
-            <$typ as ApproxEq>::approx_eq($lhs, $rhs, m)
+            let m = <$typ as $crate::ApproxEq>::Margin::zero()$(.$set($val))*;
+            <$typ as $crate::ApproxEq>::approx_eq($lhs, $rhs, m)
         }
     };
     ($typ:ty, $lhs:expr, $rhs:expr, $marg:expr) => {
         {
-            <$typ as ApproxEq>::approx_eq($lhs, $rhs, $marg)
+            <$typ as $crate::ApproxEq>::approx_eq($lhs, $rhs, $marg)
         }
     };
+}
 
-    /*
-    (f32, $lhs:expr, $rhs:expr, ulps = $ulps:expr) => {
-        {
-            let m = F32Margin { epsilon: 0.0, ulps: $ulps };
-            <$typ as ApproxEq>::approx_eq($lhs, $rhs, m)
-        }
-    };
-    (f32, $lhs:expr, $rhs:expr, epsilon = $epsilon:expr) => {
-        {
-            let m = F32Margin { epsilon: $epsilon, ulps: 0 };
-            <$typ as ApproxEq>::approx_eq($lhs, $rhs, m)
-        }
-    };
-    (f32, $lhs:expr, $rhs:expr, ulps = $ulps:expr, epsilon = $epsilon:expr) => {
-        {
-            let m = F32Margin { epsilon: $epsilon, ulps: $ulps };
-            <$typ as ApproxEq>::approx_eq($lhs, $rhs, m)
-        }
-    };
-    (f32, $lhs:expr, $rhs:expr, epsilon = $epsilon:expr, ulps = $ulps:expr) => {
-        {
-            let m = F32Margin { epsilon: $epsilon, ulps: $ulps };
-            <$typ as ApproxEq>::approx_eq($lhs, $rhs, m)
-        }
-    };
-    (f64, $lhs:expr, $rhs:expr, ulps = $ulps:expr) => {
-        {
-            let m = F64Margin { epsilon: 0.0, ulps: $ulps };
-            <$typ as ApproxEq>::approx_eq($lhs, $rhs, m)
-        }
-    };
-    (f64, $lhs:expr, $rhs:expr, epsilon = $epsilon:expr) => {
-        {
-            let m = F64Margin { epsilon: $epsilon, ulps: 0 };
-            <$typ as ApproxEq>::approx_eq($lhs, $rhs, m)
-        }
-    };
-    (f64, $lhs:expr, $rhs:expr, ulps = $ulps:expr, epsilon = $epsilon:expr) => {
-        {
-            let m = F64Margin { epsilon: $epsilon, ulps: $ulps };
-            <$typ as ApproxEq>::approx_eq($lhs, $rhs, m)
-        }
-    };
-    (f64, $lhs:expr, $rhs:expr, epsilon = $epsilon:expr, ulps = $ulps:expr) => {
-        {
-            let m = F64Margin { epsilon: $epsilon, ulps: $ulps };
-            <$typ as ApproxEq>::approx_eq($lhs, $rhs, m)
-        }
-    };
-*/
+#[test]
+fn test_macro() {
+    let a: f32 = 0.15 + 0.15 + 0.15;
+    let b: f32 = 0.1 + 0.1 + 0.25;
+    assert!( approx_eq!(f32, a, b) ); // uses the default
+    assert!( approx_eq!(f32, a, b, ulps = 2) );
+    assert!( approx_eq!(f32, a, b, epsilon = 0.00000003) );
+    assert!( approx_eq!(f32, a, b, epsilon = 0.00000003, ulps = 2) );
+    assert!( approx_eq!(f32, a, b, (0.0, 2)) );
+}
+
+#[test]
+fn test_macro_2() {
+    assert!( approx_eq!(f64, 1000000_f64, 1000000.0000000003_f64) );
+    assert!( approx_eq!(f64, 1000000_f64, 1000000.0000000003_f64, ulps=3) );
+    assert!( approx_eq!(f64, 1000000_f64, 1000000.0000000003_f64, epsilon=0.0000000004) );
+    assert!( approx_eq!(f64, 1000000_f64, 1000000.0000000003_f64, (0.0000000004, 0)) );
+    assert!( approx_eq!(f64, 1000000_f64, 1000000.0000000003_f64, (0.0, 3)) );
+}
+
+#[test]
+fn test_macro_3() {
+    use crate::F32Margin;
+
+    let a: f32 = 0.15 + 0.15 + 0.15;
+    let b: f32 = 0.1 + 0.1 + 0.25;
+    assert!( approx_eq!(f32, a, b, F32Margin { epsilon: 0.0, ulps: 2 }) );
+    assert!( approx_eq!(f32, a, b, F32Margin::default()) );
 }
