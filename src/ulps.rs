@@ -47,12 +47,12 @@ impl Ulps for f32 {
         // IEEE754 defined floating point storage representation to
         // maintain their order when their bit patterns are interpreted as
         // integers.  This is a huge boon to the task at hand, as we can
-        // (unsafely) cast to integers to find out how many ULPs apart any
+        // reinterpret them as integers to find out how many ULPs apart any
         // two floats are
 
         // Setup integer representations of the input
-        let ai32: i32 = unsafe { mem::transmute::<f32,i32>(*self) };
-        let bi32: i32 = unsafe { mem::transmute::<f32,i32>(*other) };
+        let ai32: i32 = self.to_bits() as i32;
+        let bi32: i32 = other.to_bits() as i32;
 
         ai32.wrapping_sub(bi32)
     }
@@ -124,8 +124,8 @@ fn f32_ulps_test4() {
 #[test]
 fn f32_ulps_test5() {
     let x: f32 = 2.0;
-    let ulps: i32 = unsafe { mem::transmute(x) };
-    let x2: f32 = unsafe { mem::transmute(ulps) };
+    let ulps: i32 = x.to_bits() as i32;
+    let x2: f32 = <f32>::from_bits(ulps as u32);
     assert_eq!(x, x2);
 }
 
@@ -147,12 +147,12 @@ impl Ulps for f64 {
         // IEEE754 defined floating point storage representation to
         // maintain their order when their bit patterns are interpreted as
         // integers.  This is a huge boon to the task at hand, as we can
-        // (unsafely) cast to integers to find out how many ULPs apart any
+        // reinterpret them as integers to find out how many ULPs apart any
         // two floats are
 
         // Setup integer representations of the input
-        let ai64: i64 = unsafe { mem::transmute::<f64,i64>(*self) };
-        let bi64: i64 = unsafe { mem::transmute::<f64,i64>(*other) };
+        let ai64: i64 = self.to_bits() as i64;
+        let bi64: i64 = other.to_bits() as i64;
 
         ai64.wrapping_sub(bi64)
     }
@@ -224,8 +224,8 @@ fn f64_ulps_test4() {
 #[test]
 fn f64_ulps_test5() {
     let x: f64 = 2.0;
-    let ulps: i64 = unsafe { mem::transmute(x) };
-    let x2: f64 = unsafe { mem::transmute(ulps) };
+    let ulps: i64 = x.to_bits() as i64;
+    let x2: f64 = <f64>::from_bits(ulps as u64);
     assert_eq!(x, x2);
 }
 

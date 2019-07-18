@@ -174,8 +174,8 @@ fn f32_approx_cmp_vs_partial_cmp() {
     let mut yf: f32;
     for xbits in testcases.iter() {
         for ybits in testcases.iter() {
-            xf = unsafe { mem::transmute::<u32,f32>(*xbits) };
-            yf = unsafe { mem::transmute::<u32,f32>(*ybits) };
+            xf = <f32>::from_bits(*xbits);
+            yf = <f32>::from_bits(*ybits);
             if let Some(ordering) = xf.partial_cmp(&yf) {
                 if ordering != xf.approx_cmp_ulps(&yf, 0) {
                     panic!("{} ({:x}) vs {} ({:x}): partial_cmp gives {:?} \
@@ -288,8 +288,8 @@ fn f64_approx_cmp_ulps_vs_partial_cmp() {
     let mut yf: f64;
     for xbits in testcases.iter() {
         for ybits in testcases.iter() {
-            xf = unsafe { mem::transmute::<u64,f64>(*xbits) };
-            yf = unsafe { mem::transmute::<u64,f64>(*ybits) };
+            xf = <f64>::from_bits(*xbits);
+            yf = <f64>::from_bits(*ybits);
             if let Some(ordering) = xf.partial_cmp(&yf) {
                 if ordering != xf.approx_cmp_ulps(&yf, 0) {
                     panic!("{} ({:x}) vs {} ({:x}): partial_cmp gives {:?} \
