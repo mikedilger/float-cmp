@@ -20,6 +20,32 @@ macro_rules! approx_eq {
     };
 }
 
+// Until saturating_abs() comes out of nightly, we have to code it ourselves.
+macro_rules! saturating_abs_i32 {
+    ($val:expr) => {
+        if $val.is_negative() {
+            match $val.checked_neg() {
+                Some(v) => v,
+                None => std::i32::MAX
+            }
+        } else {
+            $val
+        }
+    };
+}
+macro_rules! saturating_abs_i64 {
+    ($val:expr) => {
+        if $val.is_negative() {
+            match $val.checked_neg() {
+                Some(v) => v,
+                None => std::i64::MAX
+            }
+        } else {
+            $val
+        }
+    };
+}
+
 #[test]
 fn test_macro() {
     let a: f32 = 0.15 + 0.15 + 0.15;
