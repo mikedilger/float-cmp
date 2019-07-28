@@ -144,7 +144,6 @@ fn f32_approx_cmp_negatives() {
 #[test]
 #[allow(deprecated)]
 fn f32_approx_cmp_vs_partial_cmp() {
-    use std::mem;
 
     let testcases: [u32; 20] = [
         0,          // +0
@@ -259,7 +258,6 @@ fn f64_approx_cmp_ulps_negatives() {
 #[test]
 #[allow(deprecated)]
 fn f64_approx_cmp_ulps_vs_partial_cmp() {
-    use std::mem;
 
     let testcases: [u64; 20] = [
         0,                   // +0

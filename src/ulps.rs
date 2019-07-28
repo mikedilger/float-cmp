@@ -1,7 +1,6 @@
 // Copyright 2014-2018 Optimal Computing (NZ) Ltd.
 // Licensed under the MIT license.  See LICENSE for details.
 
-use std::mem;
 #[cfg(feature="num_traits")]
 use num_traits::NumCast;
 
