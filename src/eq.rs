@@ -99,7 +99,7 @@ impl ApproxEq for f32 {
         {
             // Perform ulps comparion last
             let diff: i32 = self.ulps(&other);
-            diff.abs() <= margin.ulps
+            saturating_abs_i32!(diff) <= margin.ulps
         }
     }
 }
@@ -227,7 +227,7 @@ impl ApproxEq for f64 {
         {
             // Perform ulps comparion last
             let diff: i64 = self.ulps(&other);
-            diff.abs() <= margin.ulps
+            saturating_abs_i64!(diff) <= margin.ulps
         }
     }
 }
@@ -276,4 +276,8 @@ fn f64_approx_eq_test6() {
     assert!(x != y); // Should not be directly equal
     println!("Ulps Difference: {}",x.ulps(&y));
     assert!(x.approx_eq(y, (0.0, 3)) == true);
+}
+#[test]
+fn f64_code_triggering_issue_20() {
+    assert_eq!((-25.0f64).approx_eq(25.0, (0.00390625, 1)), false);
 }
