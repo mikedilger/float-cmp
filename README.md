@@ -73,40 +73,22 @@ to +0.00000097).
 
 You can use the `ApproxEq` trait directly like so:
 
-```
-  # extern crate float_cmp;
-  # use float_cmp::{ApproxEq, F32Margin};
-  # fn main() {
-  # let a: f32 = 0.15 + 0.15 + 0.15;
-  # let b: f32 = 0.1 + 0.1 + 0.25;
+```rust
     assert!( a.approx_eq(b, F32Margin { ulps: 2, epsilon: 0.0 }) );
-  # }
 ```
 
 We have implemented `From<(f32,i32)>` for `F32Margin` (and similarly for `F64Margin`)
 so you can use this shorthand:
 
-```
-  # extern crate float_cmp;
-  # use float_cmp::{ApproxEq, F32Margin};
-  # fn main() {
-  # let a: f32 = 0.15 + 0.15 + 0.15;
-  # let b: f32 = 0.1 + 0.1 + 0.25;
+```rust
     assert!( a.approx_eq(b, (0.0, 2)) );
-  # }
 ```
 
 With macros, it is easier to be explicit about which type of margin you wish to set,
 without mentioning the other one (the other one will be zero). But the downside is
 that you have to specify the type you are dealing with:
 
-```
-  # #[macro_use]
-  # extern crate float_cmp;
-  # use float_cmp::{ApproxEq, F32Margin};
-  # fn main() {
-  # let a: f32 = 0.15 + 0.15 + 0.15;
-  # let b: f32 = 0.1 + 0.1 + 0.25;
+```rust
     assert!( approx_eq!(f32, a, b, ulps = 2) );
     assert!( approx_eq!(f32, a, b, epsilon = 0.00000003) );
     assert!( approx_eq!(f32, a, b, epsilon = 0.00000003, ulps = 2) );
@@ -114,7 +96,6 @@ that you have to specify the type you are dealing with:
     assert!( approx_eq!(f32, a, b, F32Margin { epsilon: 0.0, ulps: 2 }) );
     assert!( approx_eq!(f32, a, b, F32Margin::default()) );
     assert!( approx_eq!(f32, a, b) ); // uses the default
-  # }
 ```
 
 For most cases, I recommend you use a smallish integer for the `ulps` parameter (1 to 5
