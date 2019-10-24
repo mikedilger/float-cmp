@@ -13,16 +13,15 @@
 //! power to you. However, if you really do need to compare them, this crate provides a
 //! reasonable way to do so.
 //!
-//! Another crate `efloat` (which as of this writing is still undergoing considerable
-//! development) offers another solution by providing a floating point type that tracks its
-//! error bounds as operations are performed on it, and thus can implement the `ApproxEq`
-//! trait in this crate more accurately, without specifying a `Margin`.
+//! Another crate `efloat` offers another solution by providing a floating point type that
+//! tracks its error bounds as operations are performed on it, and thus can implement the
+//! `ApproxEq` trait in this crate more accurately, without specifying a `Margin`.
 //!
 //! The recommended go-to solution (although it may not be appropriate in all cases) is the
-//! `approx_eq()` function in the `ApproxEq` trait.  For `f32` and `f64`, the `F32Margin`
-//! and `F64Margin` types are provided for specifying margins as both an epsilon value and
-//! an ULPs value, and defaults are provided via `Default` (although there is no perfect
-//! default value that is always appropriate, so beware).
+//! `approx_eq()` function in the `ApproxEq` trait (or better yet, the macros).  For `f32`
+//! and `f64`, the `F32Margin` and `F64Margin` types are provided for specifying margins as
+//! both an epsilon value and an ULPs value, and defaults are provided via `Default`
+//! (although there is no perfect default value that is always appropriate, so beware).
 //!
 //! Several other traits are provided including `Ulps`, `ApproxEqUlps`, `ApproxOrdUlps`, and
 //! `ApproxEqRatio`.
@@ -76,7 +75,8 @@
 //! because as numbers fall away from equality due to the imprecise nature of their representation,
 //! they fall away in ULPs terms, not in absolute terms.  Pure epsilon-based comparisons are
 //! absolute and thus don't map well to the nature of the additive error issue. They work fine
-//! for many ranges of numbers, but not for others.
+//! for many ranges of numbers, but not for others (consider comparing -0.0000000028
+//! to +0.00000097).
 //!
 //! ## Using this crate
 //!
