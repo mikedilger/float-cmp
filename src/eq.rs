@@ -5,10 +5,11 @@ use std::{f32,f64};
 use super::Ulps;
 
 /// ApproxEq is a trait for approximate equality comparisons.
-/// The associated type defines a margin within which two values are to be
-/// considered approximately equal.
 pub trait ApproxEq: Sized {
-    type Margin: Copy;
+    /// The Margin type defines a margin within which two values are to be
+    /// considered approximately equal. It must implement Default so that
+    /// approx_eq() can be called on unknown types.
+    type Margin: Copy + Default;
 
     /// This method tests for `self` and `other` values to be approximately equal
     /// within `margin`.
