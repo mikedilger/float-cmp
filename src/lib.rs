@@ -144,7 +144,7 @@
 //!   pub y: F,
 //! }
 //!
-//! impl<'a, M: Copy, F: Copy + ApproxEq<Margin=M>> ApproxEq for &'a Vec2<F> {
+//! impl<'a, M: Copy + Default, F: Copy + ApproxEq<Margin=M>> ApproxEq for &'a Vec2<F> {
 //!   type Margin = M;
 //!
 //!   fn approx_eq<T: Into<Self::Margin>>(self, other: Self, margin: T) -> bool {
