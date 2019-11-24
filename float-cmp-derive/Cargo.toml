@@ -1,0 +1,15 @@
+[package]
+name = "float-cmp-derive"
+version = "0.7.0-pre"
+authors = ["Mike Dilger <mike@mikedilger.com>"]
+description = "procedural macros for float-cmp crate"
+repository = "https://github.com/mikedilger/float-cmp"
+documentation = "https://docs.rs/float-cmp"
+license = "MIT"
+edition = "2018"
+
+[lib]
+proc-macro = true
+
+[dependencies]
+proc-macro2 = "1.0"
