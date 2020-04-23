@@ -4,41 +4,40 @@
 use std::{f32,f64};
 use super::Ulps;
 
-/// ApproxEq is a trait for approximate equality comparisons.
+/// A trait for approximate equality comparisons.
 pub trait ApproxEq: Sized {
-    /// The Margin type defines a margin within which two values are to be
-    /// considered approximately equal. It must implement Default so that
-    /// approx_eq() can be called on unknown types.
+    /// This type type defines a margin within which two values are to be
+    /// considered approximately equal. It must implement `Default` so that
+    /// `approx_eq()` can be called on unknown types.
     type Margin: Copy + Default;
 
-    /// This method tests for `self` and `other` values to be approximately equal
-    /// within `margin`.
+    /// This method tests that the `self` and `other` values are equal within `margin`
+    /// of each other.
     fn approx_eq<M: Into<Self::Margin>>(self, other: Self, margin: M) -> bool;
 
-    /// This method tests for `self` and `other` values to be not approximately
-    /// equal within `margin`.
+    /// This method tests that the `self` and `other` values are not within `margin`
+    /// of each other.
     fn approx_ne<M: Into<Self::Margin>>(self, other: Self, margin: M) -> bool {
         !self.approx_eq(other, margin)
     }
 }
 
-/// This type defines a margin within two f32s might be considered equal
+/// This type defines a margin within two `f32` values might be considered equal,
 /// and is intended as the associated type for the `ApproxEq` trait.
 ///
-/// Two methods are used to determine approximate equality.
+/// Two tests are used to determine approximate equality.
 ///
-/// First an epsilon method is used, considering them approximately equal if they
-/// differ by <= `epsilon`.  This will only succeed for very small numbers.
-/// Note that it may succeed even if the parameters are of differing signs straddling
-/// zero.
+/// The first test considers two values approximately equal if they differ by <=
+/// `epsilon`. This will only succeed for very small numbers. Note that it may
+/// succeed even if the parameters are of differing signs, straddling zero.
 ///
-/// The second method considers how many ULPs (units of least precision, units in
-/// the last place, which is the integer number of floating point representations
+/// The second test considers how many ULPs (units of least precision, units in
+/// the last place, which is the integer number of floating-point representations
 /// that the parameters are separated by) different the parameters are and considers
-/// them approximately equal if this is <= `ulps`. For large floating point numbers,
+/// them approximately equal if this is <= `ulps`. For large floating-point numbers,
 /// an ULP can be a rather large gap, but this kind of comparison is necessary
-/// because floating point operations must round to the nearest representable value
-/// and so larger floating point values accumulate larger errors.
+/// because floating-point operations must round to the nearest representable value
+/// and so larger floating-point values accumulate larger errors.
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct F32Margin {
@@ -151,23 +150,22 @@ fn f32_approx_eq_test6() {
     assert!(x.approx_eq(y, (1000.0 * f32::EPSILON, 0)) == false);
 }
 
-/// This type defines a margin within two f32s might be considered equal
+/// This type defines a margin within two `f64` values might be considered equal,
 /// and is intended as the associated type for the `ApproxEq` trait.
 ///
-/// Two methods are used to determine approximate equality.
+/// Two tests are used to determine approximate equality.
 ///
-/// First an epsilon method is used, considering them approximately equal if they
-/// differ by <= `epsilon`.  This will only succeed for very small numbers.
-/// Note that it may succeed even if the parameters are of differing signs straddling
-/// zero.
+/// The first test considers two values approximately equal if they differ by <=
+/// `epsilon`. This will only succeed for very small numbers. Note that it may
+/// succeed even if the parameters are of differing signs, straddling zero.
 ///
-/// The second method considers how many ULPs (units of least precision, units in
-/// the last place, which is the integer number of floating point representations
+/// The second test considers how many ULPs (units of least precision, units in
+/// the last place, which is the integer number of floating-point representations
 /// that the parameters are separated by) different the parameters are and considers
-/// them approximately equal if this <= `ulps`. For large floating point numbers,
+/// them approximately equal if this is <= `ulps`. For large floating-point numbers,
 /// an ULP can be a rather large gap, but this kind of comparison is necessary
-/// because floating point operations must round to the nearest representable value
-/// and so larger floating point values accumulate larger errors.
+/// because floating-point operations must round to the nearest representable value
+/// and so larger floating-point values accumulate larger errors.
 #[derive(Debug, Clone, Copy)]
 pub struct F64Margin {
     pub epsilon: f64,
@@ -220,7 +218,7 @@ impl ApproxEq for f64 {
 
         // Check for exact equality first. This is often true, and so we get the
         // performance benefit of only doing one compare in most cases.
-        self==other ||
+        self == other ||
 
         // Perform epsilon comparison next
             ((self - other).abs() <= margin.epsilon) ||
@@ -237,9 +235,9 @@ impl ApproxEq for f64 {
 fn f64_approx_eq_test1() {
     let f: f64 = 0.0_f64;
     let g: f64 = -0.0000000000000005551115123125783_f64;
-    assert!(f != g); // Should not be directly equal
-    assert!(f.approx_eq(g, (3.0 * f64::EPSILON, 0)) == true); // 3e is enough
-    // ulps test wont ever call these equal
+    assert!(f != g); // Should not be precisely equal.
+    assert!(f.approx_eq(g, (3.0 * f64::EPSILON, 0)) == true); // 3e is enough.
+    // ULPs test won't ever call these equal.
 }
 #[test]
 fn f64_approx_eq_test2() {
@@ -265,7 +263,7 @@ fn f64_approx_eq_test5() {
     let mut sum: f64 = 0.0_f64;
     for _ in 0_isize..10_isize { sum += f; }
     let product: f64 = f * 10.0_f64;
-    assert!(sum != product); // Should not be directly equal:
+    assert!(sum != product); // Should not be precisely equaly.
     println!("Ulps Difference: {}",sum.ulps(&product));
     assert!(sum.approx_eq(product, (f64::EPSILON, 0)) == true);
     assert!(sum.approx_eq(product, (0.0, 1)) == true);
@@ -274,7 +272,7 @@ fn f64_approx_eq_test5() {
 fn f64_approx_eq_test6() {
     let x: f64 = 1000000_f64;
     let y: f64 = 1000000.0000000003_f64;
-    assert!(x != y); // Should not be directly equal
+    assert!(x != y); // Should not be precisely equal.
     println!("Ulps Difference: {}",x.ulps(&y));
     assert!(x.approx_eq(y, (0.0, 3)) == true);
 }
