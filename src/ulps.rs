@@ -1,4 +1,4 @@
-// Copyright 2014-2018 Optimal Computing (NZ) Ltd.
+// Copyright 2014-2020 Optimal Computing (NZ) Ltd.
 // Licensed under the MIT license.  See LICENSE for details.
 
 #[cfg(feature="num_traits")]
