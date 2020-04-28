@@ -139,7 +139,6 @@ fn f32_approx_eq_test5() {
     for _ in 0_isize..10_isize { sum += f; }
     let product: f32 = f * 10.0_f32;
     assert!(sum != product); // Should not be directly equal:
-    println!("Ulps Difference: {}",sum.ulps(&product));
     assert!(sum.approx_eq(product, (f32::EPSILON, 1)) == true);
     assert!(sum.approx_eq(product, F32Margin::zero()) == false);
 }
@@ -267,7 +266,6 @@ fn f64_approx_eq_test5() {
     for _ in 0_isize..10_isize { sum += f; }
     let product: f64 = f * 10.0_f64;
     assert!(sum != product); // Should not be precisely equaly.
-    println!("Ulps Difference: {}",sum.ulps(&product));
     assert!(sum.approx_eq(product, (f64::EPSILON, 0)) == true);
     assert!(sum.approx_eq(product, (0.0, 1)) == true);
 }
@@ -276,7 +274,6 @@ fn f64_approx_eq_test6() {
     let x: f64 = 1000000_f64;
     let y: f64 = 1000000.0000000003_f64;
     assert!(x != y); // Should not be precisely equal.
-    println!("Ulps Difference: {}",x.ulps(&y));
     assert!(x.approx_eq(y, (0.0, 3)) == true);
 }
 #[test]

@@ -178,12 +178,6 @@ extern crate num_traits;
 #[macro_use]
 mod macros;
 
-#[cfg(feature = "std")]
-pub fn trials() {
-    println!("are they approximately equal?: {:?}",
-             approx_eq!(f32, 1.0, 1.0000001));
-}
-
 mod ulps;
 pub use self::ulps::Ulps;
 
