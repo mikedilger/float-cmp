@@ -1,7 +1,10 @@
 // Copyright 2014-2018 Optimal Computing (NZ) Ltd.
 // Licensed under the MIT license.  See LICENSE for details.
 
-use std::{f32,f64};
+use core::{f32, f64};
+#[cfg(feature = "num-traits")]
+#[allow(unused_imports)]
+use num_traits::float::FloatCore;
 use super::Ulps;
 
 /// A trait for approximate equality comparisons.
