@@ -6,7 +6,7 @@ description = "Floating point approximate comparison traits"
 repository = "https://github.com/mikedilger/float-cmp"
 documentation = "https://docs.rs/float-cmp"
 readme = "README.md"
-keywords = [ "float", "comparison", "fuzzy", "approximate" ]
+keywords = [ "float", "comparison", "fuzzy", "approximate", "no_std" ]
 license = "MIT"
 edition = "2018"
 
@@ -18,8 +18,7 @@ doctest = true
 doc = true
 
 [features]
-default = [ "num-traits", "std" ]
-std = []
+default = [ "num-traits" ]
 
 [dependencies]
 num-traits = { version = "0.2", default-features = false, optional = true }

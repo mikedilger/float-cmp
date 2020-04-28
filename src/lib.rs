@@ -170,7 +170,7 @@
 //!
 //! [https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/](https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/)
 
-#![cfg_attr(not(feature = "std"), no_std)]
+#![no_std]
 
 #[cfg(feature="num-traits")]
 extern crate num_traits;
