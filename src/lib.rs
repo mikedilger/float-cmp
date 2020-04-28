@@ -170,19 +170,13 @@
 //!
 //! [https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/](https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/)
 
-#![cfg_attr(not(feature = "std"), no_std)]
+#![no_std]
 
 #[cfg(feature="num-traits")]
 extern crate num_traits;
 
 #[macro_use]
 mod macros;
-
-#[cfg(feature = "std")]
-pub fn trials() {
-    println!("are they approximately equal?: {:?}",
-             approx_eq!(f32, 1.0, 1.0000001));
-}
 
 mod ulps;
 pub use self::ulps::Ulps;

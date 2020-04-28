@@ -93,7 +93,6 @@ impl Ulps for f32 {
 fn f32_ulps_test1() {
     let x: f32 = 1000000_f32;
     let y: f32 = 1000000.1_f32;
-    println!("DIST IS {}",x.ulps(&y));
     assert!(x.ulps(&y) == -2);
 }
 
@@ -101,14 +100,12 @@ fn f32_ulps_test1() {
 fn f32_ulps_test2() {
     let pzero: f32 = f32::from_bits(0x00000000_u32);
     let nzero: f32 = f32::from_bits(0x80000000_u32);
-    println!("DIST IS {}",pzero.ulps(&nzero));
     assert!(pzero.ulps(&nzero) == -2147483648);
 }
 #[test]
 fn f32_ulps_test3() {
     let pinf: f32 = f32::from_bits(0x7f800000_u32);
     let ninf: f32 = f32::from_bits(0xff800000_u32);
-    println!("DIST IS {}",pinf.ulps(&ninf));
     assert!(pinf.ulps(&ninf) == -2147483648);
 }
 
@@ -116,7 +113,6 @@ fn f32_ulps_test3() {
 fn f32_ulps_test4() {
     let x: f32 = f32::from_bits(0x63a7f026_u32);
     let y: f32 = f32::from_bits(0x63a7f023_u32);
-    println!("DIST IS {}",x.ulps(&y));
     assert!(x.ulps(&y) == 3);
 }
 
@@ -193,7 +189,6 @@ impl Ulps for f64 {
 fn f64_ulps_test1() {
     let x: f64 = 1000000_f64;
     let y: f64 = 1000000.00000001_f64;
-    println!("DIST IS {}",x.ulps(&y));
     assert!(x.ulps(&y) == -86);
 }
 
@@ -201,14 +196,12 @@ fn f64_ulps_test1() {
 fn f64_ulps_test2() {
     let pzero: f64 = f64::from_bits(0x0000000000000000_u64);
     let nzero: f64 = f64::from_bits(0x8000000000000000_u64);
-    println!("DIST IS {}",pzero.ulps(&nzero));
     assert!(pzero.ulps(&nzero) == -9223372036854775808i64);
 }
 #[test]
 fn f64_ulps_test3() {
     let pinf: f64 = f64::from_bits(0x7f80000000000000_u64);
     let ninf: f64 = f64::from_bits(0xff80000000000000_u64);
-    println!("DIST IS {}",pinf.ulps(&ninf));
     assert!(pinf.ulps(&ninf) == -9223372036854775808i64);
 }
 
@@ -216,7 +209,6 @@ fn f64_ulps_test3() {
 fn f64_ulps_test4() {
     let x: f64 = f64::from_bits(0xd017f6cc63a7f026_u64);
     let y: f64 = f64::from_bits(0xd017f6cc63a7f023_u64);
-    println!("DIST IS {}",x.ulps(&y));
     assert!(x.ulps(&y) == 3);
 }
 
