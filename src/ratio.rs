@@ -1,8 +1,8 @@
 // Copyright 2014-2018 Optimal Computing (NZ) Ltd.
 // Licensed under the MIT license.  See LICENSE for details.
 
-use std::cmp::PartialOrd;
-use std::ops::{Sub,Div,Neg};
+use core::cmp::PartialOrd;
+use core::ops::{Sub, Div, Neg};
 use num_traits::Zero;
 
 /// ApproxEqRatio is a trait for approximate equality comparisons bounding the ratio
