@@ -72,7 +72,7 @@ to +0.00000097).
 ## Using this crate
 
 By default this crate enables the `ratio` module providing the `ApproxEqRatio` trait.  This
-feature pulls in `num-traits`.  If you disable this feature, you'll need to ehter enable
+feature pulls in `num-traits`.  If you disable this feature, you'll need to either enable
 `num-traits` directly or else enable the `std` feature; otherwise it won't compile. This crate
 is `#![no_std]` unless you enable the `std` feature.
 
