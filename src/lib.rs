@@ -170,10 +170,7 @@
 //!
 //! [https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/](https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/)
 
-#![no_std]
-
-#[cfg(feature="num-traits")]
-extern crate num_traits;
+#![cfg_attr(not(feature = "std"), no_std)]
 
 #[macro_use]
 mod macros;
@@ -187,7 +184,7 @@ pub use self::ulps_eq::ApproxEqUlps;
 mod eq;
 pub use self::eq::{ApproxEq, F32Margin, F64Margin};
 
-#[cfg(feature="num-traits")]
+#[cfg(feature="ratio")]
 mod ratio;
-#[cfg(feature="num-traits")]
+#[cfg(feature="ratio")]
 pub use self::ratio::ApproxEqRatio;
