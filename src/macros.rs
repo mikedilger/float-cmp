@@ -3,7 +3,7 @@
 macro_rules! approx_eq {
     ($typ:ty, $lhs:expr, $rhs:expr) => {
         {
-            let m: <$typ as $crate::ApproxEq>::Margin = Default::default();
+            let m = <$typ as $crate::ApproxEq>::Margin::default();
             <$typ as $crate::ApproxEq>::approx_eq($lhs, $rhs, m)
         }
     };
