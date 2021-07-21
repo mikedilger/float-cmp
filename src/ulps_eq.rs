@@ -1,6 +1,9 @@
 // Copyright 2014-2020 Optimal Computing (NZ) Ltd.
 // Licensed under the MIT license.  See LICENSE for details.
 
+#[cfg(feature = "num-traits")]
+#[allow(unused_imports)]
+use num_traits::float::FloatCore;
 use super::Ulps;
 
 /// ApproxEqUlps is a trait for approximate equality comparisons.
@@ -34,7 +37,7 @@ impl ApproxEqUlps for f32 {
     fn approx_eq_ulps(&self, other: &f32, ulps: i32) -> bool {
         // -0 and +0 are drastically far in ulps terms, so
         // we need a special case for that.
-        if *self==*other { return true; }
+        if (*self - *other).abs() < core::f32::EPSILON { return true; }
 
         // Handle differing signs as a special case, even if
         // they are very close, most people consider them
@@ -77,7 +80,7 @@ impl ApproxEqUlps for f64 {
     fn approx_eq_ulps(&self, other: &f64, ulps: i64) -> bool {
         // -0 and +0 are drastically far in ulps terms, so
         // we need a special case for that.
-        if *self==*other { return true; }
+        if (*self - *other).abs() < core::f64::EPSILON / 2.0 { return true; }
 
         // Handle differing signs as a special case, even if
         // they are very close, most people consider them
