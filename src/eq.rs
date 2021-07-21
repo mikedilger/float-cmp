@@ -66,13 +66,13 @@ impl F32Margin {
     }
     pub fn epsilon(self, epsilon: f32) -> Self {
         F32Margin {
-            epsilon: epsilon,
+            epsilon,
             ..self
         }
     }
     pub fn ulps(self, ulps: i32) -> Self {
         F32Margin {
-            ulps: ulps,
+            ulps,
             ..self
         }
     }
@@ -192,13 +192,13 @@ impl F64Margin {
     }
     pub fn epsilon(self, epsilon: f64) -> Self {
         F64Margin {
-            epsilon: epsilon,
+            epsilon,
             ..self
         }
     }
     pub fn ulps(self, ulps: i64) -> Self {
         F64Margin {
-            ulps: ulps,
+            ulps,
             ..self
         }
     }

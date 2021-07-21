@@ -1,6 +1,9 @@
 // Copyright 2014-2020 Optimal Computing (NZ) Ltd.
 // Licensed under the MIT license.  See LICENSE for details.
 
+#[cfg(feature = "num-traits")]
+#[allow(unused_imports)]
+use num_traits::float::FloatCore;
 use super::Ulps;
 
 /// ApproxEqUlps is a trait for approximate equality comparisons.
