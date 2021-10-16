@@ -302,3 +302,28 @@ fn test_slices() {
     assert!( !  [1.33, 2.4, 2.5].approx_eq(&[1.33, 2.4], (0.0, 0_i64)) );
 }
 
+impl<T> ApproxEq for Option<T>
+where T: Copy + ApproxEq {
+    type Margin = <T as ApproxEq>::Margin;
+
+    fn approx_eq<M: Into<Self::Margin>>(self, other: Self, margin: M) -> bool {
+        let margin = margin.into();
+        if self.is_none() && other.is_none() { return true; }
+        if self.is_some() && other.is_some() {
+            return self.as_ref().unwrap().approx_eq(*other.as_ref().unwrap(), margin)
+        } else {
+            return false;
+        }
+    }
+}
+
+#[test]
+fn test_option() {
+    let x: Option<f32> = None;
+    assert!( x.approx_eq(None, (0.0, 0_i32)) );
+    assert!( Some(5.3_f32).approx_eq(Some(5.3), (0.0, 0_i32)) );
+    assert!( Some(5.3_f32).approx_ne(Some(5.7), (0.0, 0_i32)) );
+    assert!( Some(5.3_f32).approx_ne(None, (0.0, 0_i32)) );
+    assert!( x.approx_ne(Some(5.3), (0.0, 0_i32)) );
+}
+
