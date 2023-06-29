@@ -7,12 +7,31 @@ use core::{f32, f64};
 use num_traits::float::FloatCore;
 use super::Ulps;
 
+/// A margin specifing a maximum distance two floating point values can be while
+/// still being considered equal enough.
+pub trait FloatMargin: Copy + Default {
+    /// A floating-point type used for epsilon values
+    type F;
+
+    /// An integer type used for ulps values
+    type I;
+
+    /// Zero margin
+    fn zero() -> Self;
+
+    /// Set the epsilon value for this margin
+    fn epsilon(self, epsilon: Self::F) -> Self;
+
+    /// Set the ulps value for this margin
+    fn ulps(self, ulps: Self::I) -> Self;
+}
+
 /// A trait for approximate equality comparisons.
 pub trait ApproxEq: Sized {
     /// This type type defines a margin within which two values are to be
     /// considered approximately equal. It must implement `Default` so that
     /// `approx_eq()` can be called on unknown types.
-    type Margin: Copy + Default;
+    type Margin: FloatMargin;
 
     /// This method tests that the `self` and `other` values are equal within `margin`
     /// of each other.
@@ -56,21 +75,24 @@ impl Default for F32Margin {
         }
     }
 }
-impl F32Margin {
+impl FloatMargin for F32Margin {
+    type F = f32;
+    type I = i32;
+
     #[inline]
-    pub fn zero() -> F32Margin {
+    fn zero() -> F32Margin {
         F32Margin {
             epsilon: 0.0,
             ulps: 0
         }
     }
-    pub fn epsilon(self, epsilon: f32) -> Self {
+    fn epsilon(self, epsilon: f32) -> Self {
         F32Margin {
             epsilon,
             ..self
         }
     }
-    pub fn ulps(self, ulps: i32) -> Self {
+    fn ulps(self, ulps: i32) -> Self {
         F32Margin {
             ulps,
             ..self
@@ -182,21 +204,24 @@ impl Default for F64Margin {
         }
     }
 }
-impl F64Margin {
+impl FloatMargin for F64Margin {
+    type F = f64;
+    type I = i64;
+
     #[inline]
-    pub fn zero() -> F64Margin {
+    fn zero() -> F64Margin {
         F64Margin {
             epsilon: 0.0,
             ulps: 0
         }
     }
-    pub fn epsilon(self, epsilon: f64) -> Self {
+    fn epsilon(self, epsilon: f64) -> Self {
         F64Margin {
             epsilon,
             ..self
         }
     }
-    pub fn ulps(self, ulps: i64) -> Self {
+    fn ulps(self, ulps: i64) -> Self {
         F64Margin {
             ulps,
             ..self

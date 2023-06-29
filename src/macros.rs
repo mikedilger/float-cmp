@@ -9,6 +9,7 @@ macro_rules! approx_eq {
     };
     ($typ:ty, $lhs:expr, $rhs:expr $(, $set:ident = $val:expr)*) => {
         {
+            use $crate::FloatMargin;
             let m = <$typ as $crate::ApproxEq>::Margin::zero()$(.$set($val))*;
             <$typ as $crate::ApproxEq>::approx_eq($lhs, $rhs, m)
         }

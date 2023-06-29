@@ -142,14 +142,14 @@
 //! it for references to your type as shown.
 //!
 //! ```
-//! use float_cmp::ApproxEq;
+//! use float_cmp::{ApproxEq, FloatMargin};
 //!
 //! pub struct Vec2<F> {
 //!   pub x: F,
 //!   pub y: F,
 //! }
 //!
-//! impl<'a, M: Copy + Default, F: Copy + ApproxEq<Margin=M>> ApproxEq for &'a Vec2<F> {
+//! impl<'a, M: FloatMargin, F: Copy + ApproxEq<Margin=M>> ApproxEq for &'a Vec2<F> {
 //!   type Margin = M;
 //!
 //!   fn approx_eq<T: Into<Self::Margin>>(self, other: Self, margin: T) -> bool {
@@ -187,7 +187,7 @@ mod ulps_eq;
 pub use self::ulps_eq::ApproxEqUlps;
 
 mod eq;
-pub use self::eq::{ApproxEq, F32Margin, F64Margin};
+pub use self::eq::{ApproxEq, F32Margin, F64Margin, FloatMargin};
 
 #[cfg(feature="ratio")]
 mod ratio;
