@@ -108,6 +108,12 @@ impl From<(f32, i32)> for F32Margin {
     }
 }
 
+// no-std compatible abs function
+#[inline(always)]
+fn f32abs(x: f32) -> f32 {
+    f32::from_bits(x.to_bits() & !(1 << 31))
+}
+
 impl ApproxEq for f32 {
     type Margin = F32Margin;
 
@@ -116,15 +122,16 @@ impl ApproxEq for f32 {
 
         // Check for exact equality first. This is often true, and so we get the
         // performance benefit of only doing one compare in most cases.
-        self==other ||
-
-        // Perform epsilon comparison next
-            ((self - other).abs() <= margin.epsilon) ||
-
+        self == other ||
         {
-            // Perform ulps comparion last
-            let diff: i32 = self.ulps(&other);
-            saturating_abs_i32!(diff) <= margin.ulps
+            // Perform epsilon comparison next
+            let eps = f32abs(self - other);
+            (eps <= margin.epsilon) ||
+            {
+                // Perform ulps comparion last
+                let diff: i32 = self.ulps(&other);
+                saturating_abs_i32!(diff) <= margin.ulps
+            }
         }
     }
 }
@@ -237,6 +244,12 @@ impl From<(f64, i64)> for F64Margin {
     }
 }
 
+// no-std compatible abs function
+#[inline(always)]
+fn f64abs(x: f64) -> f64 {
+    f64::from_bits(x.to_bits() & !(1 << 63))
+}
+
 impl ApproxEq for f64 {
     type Margin = F64Margin;
 
@@ -246,14 +259,15 @@ impl ApproxEq for f64 {
         // Check for exact equality first. This is often true, and so we get the
         // performance benefit of only doing one compare in most cases.
         self == other ||
-
-        // Perform epsilon comparison next
-            ((self - other).abs() <= margin.epsilon) ||
-
         {
-            // Perform ulps comparion last
-            let diff: i64 = self.ulps(&other);
-            saturating_abs_i64!(diff) <= margin.ulps
+            // Perform epsilon comparison next
+            let eps = f64abs(self - other);
+            (eps <= margin.epsilon) ||
+            {
+                // Perform ulps comparion last
+                let diff: i64 = self.ulps(&other);
+                saturating_abs_i64!(diff) <= margin.ulps
+            }
         }
     }
 }
