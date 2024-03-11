@@ -341,16 +341,10 @@ where
 
     fn approx_eq<M: Into<Self::Margin>>(self, other: Self, margin: M) -> bool {
         let margin = margin.into();
-        if self.is_none() && other.is_none() {
-            return true;
-        }
-        if self.is_some() && other.is_some() {
-            return self
-                .as_ref()
-                .unwrap()
-                .approx_eq(*other.as_ref().unwrap(), margin);
-        } else {
-            return false;
+        match (self, other) {
+            (None, None) => true,
+            (Some(slf), Some(oth)) => slf.approx_eq(oth, margin),
+            _ => false,
         }
     }
 }
