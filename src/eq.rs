@@ -7,7 +7,7 @@ use core::{f32, f64};
 #[allow(unused_imports)]
 use num_traits::float::FloatCore;
 
-/// A margin specifing a maximum distance two floating point values can be while
+/// A margin specifying a maximum distance two floating point values can be while
 /// still being considered equal enough.
 pub trait FloatMargin: Copy + Default {
     /// A floating-point type used for epsilon values
@@ -120,7 +120,7 @@ impl ApproxEq for f32 {
             // Perform epsilon comparison next
             let eps = f32abs(self - other);
             (eps <= margin.epsilon) || {
-                // Perform ulps comparion last
+                // Perform ulps comparison last
                 let diff: i32 = self.ulps(&other);
                 saturating_abs_i32!(diff) <= margin.ulps
             }
@@ -250,7 +250,7 @@ impl ApproxEq for f64 {
             // Perform epsilon comparison next
             let eps = f64abs(self - other);
             (eps <= margin.epsilon) || {
-                // Perform ulps comparion last
+                // Perform ulps comparison last
                 let diff: i64 = self.ulps(&other);
                 saturating_abs_i64!(diff) <= margin.ulps
             }
@@ -292,7 +292,7 @@ fn f64_approx_eq_test5() {
         sum += f;
     }
     let product: f64 = f * 10.0_f64;
-    assert!(sum != product); // Should not be precisely equaly.
+    assert!(sum != product); // Should not be precisely equally.
     assert!(sum.approx_eq(product, (f64::EPSILON, 0)) == true);
     assert!(sum.approx_eq(product, (0.0, 1)) == true);
 }
