@@ -78,7 +78,7 @@ macro_rules! saturating_abs_i32 {
         if $val.is_negative() {
             match $val.checked_neg() {
                 Some(v) => v,
-                None => core::i32::MAX,
+                None => i32::MAX,
             }
         } else {
             $val
@@ -90,7 +90,7 @@ macro_rules! saturating_abs_i64 {
         if $val.is_negative() {
             match $val.checked_neg() {
                 Some(v) => v,
-                None => core::i64::MAX,
+                None => i64::MAX,
             }
         } else {
             $val
