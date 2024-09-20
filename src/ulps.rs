@@ -1,7 +1,7 @@
 // Copyright 2014-2020 Optimal Computing (NZ) Ltd.
 // Licensed under the MIT license.  See LICENSE for details.
 
-#[cfg(feature = "num_traits")]
+#[cfg(feature = "num-traits")]
 use num_traits::NumCast;
 
 #[inline]
@@ -28,7 +28,7 @@ fn f64_ordered_bits(f: f64) -> u64 {
 
 /// A trait for floating point numbers which computes the number of representable
 /// values or ULPs (Units of Least Precision) that separate the two given values.
-#[cfg(feature = "num_traits")]
+#[cfg(feature = "num-traits")]
 pub trait Ulps {
     type U: Copy + NumCast;
 
@@ -44,7 +44,7 @@ pub trait Ulps {
     fn prev(&self) -> Self;
 }
 
-#[cfg(not(feature = "num_traits"))]
+#[cfg(not(feature = "num-traits"))]
 pub trait Ulps {
     type U: Copy;
 
