@@ -1,4 +1,5 @@
-// Copyright 2014-2020 Optimal Computing (NZ) Ltd.
+// Copyright (c) 2014-2022 Optimal Computing (NZ) Ltd
+// Copyright (c) 2022-2025 Michael Dilger
 // Licensed under the MIT license.  See LICENSE for details.
 
 //! # float-cmp
