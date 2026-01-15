@@ -1,5 +1,5 @@
 // Copyright (c) 2014-2022 Optimal Computing (NZ) Ltd
-// Copyright (c) 2022-2025 Michael Dilger
+// Copyright (c) 2022-2026 Michael Dilger
 // Licensed under the MIT license.  See LICENSE for details.
 
 use super::Ulps;
