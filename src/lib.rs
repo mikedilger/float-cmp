@@ -194,3 +194,6 @@ pub use self::eq::{ApproxEq, F32Margin, F64Margin, FloatMargin};
 mod ratio;
 #[cfg(feature = "ratio")]
 pub use self::ratio::ApproxEqRatio;
+
+#[cfg(feature = "ordered-float")]
+mod ordered_float;
