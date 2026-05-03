@@ -24,4 +24,4 @@ std = [ ]
 
 [dependencies]
 num-traits = { version = "0.2.19", default-features = false, optional = true }
-ordered-float = { version = "5.3", optional = true }
+ordered-float = { git = "https://git.mikedilger.com/general/rust-ordered-float.git", features = [ "serde", "bytemuck", "bitcode" ], optional = true }
